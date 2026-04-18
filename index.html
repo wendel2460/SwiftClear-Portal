@@ -63,7 +63,6 @@
         
         <!-- Left Side: Branding / Info -->
         <div class="md:w-5/12 bg-gradient-to-br from-chmsu-green to-[#084223] text-white p-10 flex flex-col justify-between relative overflow-hidden bg-pattern">
-            <!-- Decorative circle -->
             <div class="absolute -top-24 -left-24 w-64 h-64 bg-white opacity-5 rounded-full"></div>
             <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-chmsu-gold opacity-10 rounded-full"></div>
             
@@ -99,15 +98,12 @@
 
         <!-- Right Side: Forms -->
         <div class="md:w-7/12 p-8 md:p-12 relative flex items-center justify-center bg-white">
-            
-            <!-- Documentation Link -->
-            <a href="SwiftClear Documentation.html" target="_blank" class="absolute top-6 right-6 text-xs sm:text-sm text-gray-500 hover:text-chmsu-green font-medium flex items-center gap-2 transition-colors bg-gray-50 hover:bg-green-50 px-3 py-1.5 rounded-full border border-gray-200 shadow-sm z-20">
+            <a href="https://wendel2460.github.io/SwiftClear-Docs/" target="_blank" class="absolute top-6 right-6 text-xs sm:text-sm text-gray-500 hover:text-chmsu-green font-medium flex items-center gap-2 transition-colors bg-gray-50 hover:bg-green-50 px-3 py-1.5 rounded-full border border-gray-200 shadow-sm z-20">
                 <i class="fa-solid fa-book-open"></i> <span class="hidden sm:inline">Documentation</span>
             </a>
 
             <div class="w-full max-w-md relative">
-                
-                <!-- ================= LOGIN FORM ================= -->
+                <!-- LOGIN FORM -->
                 <div id="login-form" class="form-transition show-form">
                     <div class="text-center mb-8">
                         <h2 class="text-2xl font-bold text-gray-800">Welcome Back</h2>
@@ -141,23 +137,18 @@
                             </div>
                         </div>
 
-                        <div class="flex items-center">
-                            <input type="checkbox" id="remember" class="w-4 h-4 text-chmsu-green border-gray-300 rounded focus:ring-chmsu-green">
-                            <label for="remember" class="ml-2 block text-sm text-gray-600">Remember me for 30 days</label>
-                        </div>
-
                         <button type="submit" class="w-full bg-chmsu-green hover:bg-[#084223] text-white font-bold py-3 rounded-xl transition-all transform hover:-translate-y-0.5 shadow-lg shadow-green-900/20">
                             Sign In
                         </button>
                     </form>
-
-                    <p class="mt-8 text-center text-sm text-gray-600">
+                    
+                    <p class="mt-6 text-center text-sm text-gray-600">
                         Don't have an account? 
                         <button type="button" onclick="toggleForms('signup')" class="font-bold text-chmsu-green hover:underline">Register Here</button>
                     </p>
                 </div>
 
-                <!-- ================= SIGN UP FORM ================= -->
+                <!-- SIGN UP FORM -->
                 <div id="signup-form" class="form-transition hide-form">
                     <div class="text-center mb-6">
                         <h2 class="text-2xl font-bold text-gray-800">Create Account</h2>
@@ -175,9 +166,7 @@
                             </div>
                         </div>
 
-                        <!-- Grid for ID and Contact Number -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <!-- STUDENT ID FIELD -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Student ID</label>
                                 <div class="relative">
@@ -187,8 +176,6 @@
                                     <input type="text" id="signup-id" required class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all" placeholder="2024-XXXXX">
                                 </div>
                             </div>
-                            
-                            <!-- CONTACT NUMBER FIELD -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
                                 <div class="relative">
@@ -243,144 +230,50 @@
                     </p>
                 </div>
 
-                <!-- ================= FORGOT PASSWORD FORM ================= -->
+                <!-- FORGOT PASSWORD FORM -->
                 <div id="forgot-form" class="form-transition hide-form">
                     <button type="button" onclick="toggleForms('login')" class="absolute -top-6 -left-2 text-gray-400 hover:text-chmsu-green transition-colors flex items-center gap-1 text-sm font-medium">
                         <i class="fa-solid fa-arrow-left"></i> Back to login
                     </button>
-                    
                     <div class="text-center mb-8 mt-4">
-                        <div class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="fa-solid fa-key text-2xl text-chmsu-green"></i>
-                        </div>
                         <h2 class="text-2xl font-bold text-gray-800">Reset Password</h2>
-                        <p class="text-sm text-gray-500 mt-2">Enter your registered email address and we'll send you instructions to reset your password.</p>
+                        <p class="text-sm text-gray-500 mt-2">Enter your email and we'll send reset instructions.</p>
                     </div>
-
                     <form onsubmit="handleForgotPassword(event)" class="space-y-5">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i class="fa-regular fa-envelope text-gray-400"></i>
-                                </div>
-                                <input type="email" id="forgot-email" required class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all" placeholder="student@chmsu.edu.ph">
-                            </div>
-                        </div>
-
-                        <button type="submit" class="w-full bg-chmsu-green hover:bg-[#084223] text-white font-bold py-3 rounded-xl transition-all transform hover:-translate-y-0.5 shadow-lg shadow-green-900/20">
-                            Send Reset Link
-                        </button>
+                        <input type="email" id="forgot-email" required class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all" placeholder="student@chmsu.edu.ph">
+                        <button type="submit" class="w-full bg-chmsu-green hover:bg-[#084223] text-white font-bold py-3 rounded-xl shadow-lg">Send Reset Link</button>
                     </form>
                 </div>
-
             </div>
         </div>
     </div>
 
     <!-- JavaScript Logic -->
     <script>
-        // Mock Database for testing functionality
+        // Base demo users
         const mockUsers = {
-            'wendel_f': { password: 'pass123', role: 'student', name: 'Wendel F.', redirect: 'student_dashboard.html', contact: '09123456789' },
-            'reg': { password: 'pass123', role: 'registrar', name: 'Registrar Admin', redirect: 'registrar_dashboard.html', contact: '0341234567' },
-            'lib': { password: 'pass123', role: 'library', name: 'Library Admin', redirect: 'library_dashboard.html', contact: '0347654321' },
-            'bus': { password: 'pass123', role: 'business', name: 'Business Admin', redirect: 'business_dashboard.html', contact: '0349876543' },
-            'cict_dean': { password: 'pass123', role: 'dean', name: 'CICT Dean', redirect: 'dean_dashboard.html', contact: '0345551234' }
+            'wendel_f': { password: 'pass123', role: 'Student', name: 'Wendel N. Flores', redirect: 'student_dashboard.html' },
+            'reg': { password: 'pass123', role: 'Registrar', name: 'Registrar Admin', redirect: 'registrar_dashboard.html' },
+            'lib': { password: 'pass123', role: 'Library', name: 'Chief Librarian', redirect: 'library_dashboard.html' },
+            'bus': { password: 'pass123', role: 'Business Office', name: 'Accounting Officer', redirect: 'business_dashboard.html' },
+            'cict_dean': { password: 'pass123', role: 'College Dean', name: 'Dean of CICT', redirect: 'dean_dashboard.html' }
         };
 
-        // --- UI Interactions ---
-        function togglePassword(inputId, button) {
-            const input = document.getElementById(inputId);
-            const icon = button.querySelector('i');
-            
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
+        // Get merged users (base + custom registrations)
+        function getAllUsers() {
+            let customUsers = {};
+            try {
+                customUsers = JSON.parse(localStorage.getItem('sc_custom_users')) || {};
+            } catch(e) {}
+            return { ...mockUsers, ...customUsers };
         }
 
-        function toggleForms(targetForm) {
-            const login = document.getElementById('login-form');
-            const signup = document.getElementById('signup-form');
-            const forgot = document.getElementById('forgot-form');
-
-            // Hide all
-            [login, signup, forgot].forEach(form => {
-                form.classList.remove('show-form');
-                form.classList.add('hide-form');
-            });
-
-            // Show target
-            if (targetForm === 'login') {
-                login.classList.remove('hide-form');
-                login.classList.add('show-form');
-            } else if (targetForm === 'signup') {
-                signup.classList.remove('hide-form');
-                signup.classList.add('show-form');
-            } else if (targetForm === 'forgot') {
-                forgot.classList.remove('hide-form');
-                forgot.classList.add('show-form');
-            }
-        }
-
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            
-            const bgColor = type === 'success' ? 'bg-emerald-500' : 'bg-red-500';
-            const icon = type === 'success' ? 'fa-check-circle' : 'fa-circle-exclamation';
-
-            toast.className = `${bgColor} text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-y-[-20px] opacity-0`;
-            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span class="font-medium text-sm">${message}</span>`;
-            
-            container.appendChild(toast);
-            
-            // Animate in
-            setTimeout(() => {
-                toast.classList.remove('translate-y-[-20px]', 'opacity-0');
-            }, 10);
-
-            // Remove after 3 seconds
-            setTimeout(() => {
-                toast.classList.add('opacity-0');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        // --- Form Submissions ---
-        function handleLogin(e) {
-            e.preventDefault();
-            const username = document.getElementById('login-username').value.trim();
-            const password = document.getElementById('login-password').value;
-
-            const user = mockUsers[username];
-
-            // Verify credentials
-            if (user && user.password === password) {
-                showToast(`Welcome, ${user.name}! Routing to dashboard...`, 'success');
-                console.log(`Authenticated as ${user.role}. Target: ${user.redirect}`);
-                
-                // Redirect to the assigned dashboard after 1.5 seconds
-                setTimeout(() => { 
-                    window.location.href = user.redirect; 
-                }, 1500);
-            } else {
-                showToast("Invalid username or password. Please try again.", "error");
-            }
-        }
-
+        // --- Form Submissions (Bug Fixes applied here) ---
         function handleSignup(e) {
             e.preventDefault();
-            const fullName = document.getElementById('signup-name').value;
-            const studentId = document.getElementById('signup-id').value;
-            const contact = document.getElementById('signup-contact').value;
-            const email = document.getElementById('signup-email').value;
+            const fullName = document.getElementById('signup-name').value.trim();
+            const studentId = document.getElementById('signup-id').value.trim();
+            const contact = document.getElementById('signup-contact').value.trim();
             const password = document.getElementById('signup-password').value;
             const confirm = document.getElementById('signup-confirm').value;
 
@@ -389,36 +282,82 @@
                 return;
             }
 
-            // Save the new user to our mock database using the Student ID as the username
-            mockUsers[studentId] = {
+            const allUsers = getAllUsers();
+            
+            // BUG FIX 1: Check if account already exists
+            if (allUsers[studentId]) {
+                showToast("An account with this Student ID already exists!", "error");
+                return; 
+            }
+
+            // Save new user to localStorage
+            const customUsers = JSON.parse(localStorage.getItem('sc_custom_users')) || {};
+            customUsers[studentId] = {
                 password: password,
-                role: 'student',
+                role: 'Student',
                 name: fullName,
                 contact: contact, 
                 redirect: 'student_dashboard.html'
             };
+            localStorage.setItem('sc_custom_users', JSON.stringify(customUsers));
 
-            showToast("Account created successfully! Please sign in with your Student ID.", "success");
-            
-            // Clear form and switch to login
+            showToast("Account created successfully! Please sign in.", "success");
             e.target.reset();
+            
             setTimeout(() => {
                 toggleForms('login');
-                // Pre-fill Student ID in the login form for convenience
                 document.getElementById('login-username').value = studentId;
             }, 1500);
         }
 
-        function handleForgotPassword(e) {
+        function handleLogin(e) {
             e.preventDefault();
-            const email = document.getElementById('forgot-email').value;
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
             
-            showToast("Reset link sent to your email address.", "success");
-            
-            setTimeout(() => {
-                toggleForms('login');
-                e.target.reset();
-            }, 2000);
+            const allUsers = getAllUsers();
+            const user = allUsers[username];
+
+            if (user && user.password === password) {
+                // BUG FIX 2: Properly save the custom name to the session
+                localStorage.setItem('sc_user', JSON.stringify({ 
+                    username: username, 
+                    name: user.name, 
+                    role: user.role 
+                }));
+
+                showToast(`Welcome, ${user.name}! Redirecting...`, 'success');
+                setTimeout(() => { window.location.href = user.redirect; }, 1000);
+            } else {
+                showToast("Invalid credentials. Please try again.", "error");
+            }
+        }
+
+        // --- Standard UI Functions ---
+        function togglePassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('i');
+            input.type = input.type === 'password' ? 'text' : 'password';
+            icon.className = input.type === 'password' ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
+        }
+
+        function toggleForms(target) {
+            document.getElementById('login-form').classList.toggle('show-form', target === 'login');
+            document.getElementById('login-form').classList.toggle('hide-form', target !== 'login');
+            document.getElementById('signup-form').classList.toggle('show-form', target === 'signup');
+            document.getElementById('signup-form').classList.toggle('hide-form', target !== 'signup');
+            document.getElementById('forgot-form').classList.toggle('show-form', target === 'forgot');
+            document.getElementById('forgot-form').classList.toggle('hide-form', target !== 'forgot');
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `${type === 'success' ? 'bg-emerald-500' : 'bg-red-500'} text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 transition-all duration-300 opacity-0 transform translate-y-[-20px]`;
+            toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-check-circle' : 'fa-circle-exclamation'}"></i> <span class="font-medium text-sm">${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.remove('opacity-0', 'translate-y-[-20px]'), 10);
+            setTimeout(() => { toast.classList.add('opacity-0'); setTimeout(() => toast.remove(), 300); }, 3000);
         }
     </script>
 </body>
