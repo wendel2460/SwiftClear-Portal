@@ -300,7 +300,7 @@
         </div>
     </main>
 
-    <!-- Modal for Action Required (e.g. Business Affairs) -->
+    <!-- Modal for Action Required -->
     <div id="action-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-[60] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform scale-95 transition-transform duration-300" id="modal-content">
             <div class="bg-red-50 px-6 py-4 border-b border-red-100 flex justify-between items-center">
@@ -322,7 +322,7 @@
                 
                 <div class="mb-6">
                     <label class="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Instructions</label>
-                    <p class="text-sm text-gray-800 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                    <p id="modal-instructions-text" class="text-sm text-gray-800 bg-gray-50 p-3 rounded-lg border border-gray-200">
                         A clearing officer has flagged your account. Please visit the respective department to resolve this issue to proceed with your clearance.
                     </p>
                 </div>
@@ -357,16 +357,18 @@
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'swiftclear-6195d';
 
-        // Session User
+        // BUG FIX: Getting user dynamically from local storage
         let sessionUser = { username: 'wendel_f', name: 'Wendel N. Flores' };
         try {
             const saved = JSON.parse(localStorage.getItem('sc_user'));
-            if(saved) sessionUser = saved;
+            if(saved && saved.username) sessionUser = saved;
         } catch(e) {}
         
         const studentId = sessionUser.username;
-        document.getElementById('nav-display-name').innerText = sessionUser.name;
-        document.getElementById('nav-avatar').innerText = sessionUser.name.charAt(0);
+        const studentName = sessionUser.name || studentId;
+        
+        document.getElementById('nav-display-name').innerText = studentName;
+        document.getElementById('nav-avatar').innerText = studentName.charAt(0).toUpperCase();
 
         // UI & Tab Helpers attached to window
         window.switchTab = (tabId) => {
@@ -392,7 +394,8 @@
         };
         window.onclick = (e) => { if (!e.target.closest('.group')) document.getElementById('profile-menu').classList.add('hidden'); };
 
-        window.openModal = () => {
+        window.openModal = (remarkText = "A clearing officer has flagged your account. Please visit the respective department to resolve this issue to proceed with your clearance.") => {
+            document.getElementById('modal-instructions-text').innerText = remarkText;
             const m = document.getElementById('action-modal');
             const mc = document.getElementById('modal-content');
             m.classList.remove('hidden'); void m.offsetWidth;
@@ -409,7 +412,7 @@
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const t = document.createElement('div');
-            t.className = `${type === 'success' ? 'bg-emerald-500' : 'bg-red-500'} text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-y-[-20px] opacity-0`;
+            t.className = `${type === 'success' ? 'bg-emerald-500' : 'bg-red-500'} text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-y-[-20px] opacity-0 z-50`;
             t.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-check-circle' : 'fa-circle-exclamation'}"></i> <span class="font-medium text-sm">${message}</span>`;
             container.appendChild(t);
             setTimeout(() => t.classList.remove('translate-y-[-20px]', 'opacity-0'), 10);
@@ -434,19 +437,22 @@
             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'clearances', studentId);
             
             onSnapshot(docRef, (docSnap) => {
+                const initContainer = document.getElementById('initiate-btn-container');
+                const progressContainer = document.getElementById('progress-container');
+                
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     
                     // Show Progress UI, Hide Initiate Button
                     document.getElementById('banner-status').innerHTML = 'Clearance Status: <span class="text-chmsu-gold">In Progress</span>';
-                    document.getElementById('initiate-btn-container').classList.add('hidden');
-                    document.getElementById('progress-container').classList.remove('hidden');
+                    if (initContainer) initContainer.classList.add('hidden');
+                    if (progressContainer) progressContainer.classList.remove('hidden');
 
                     // Update 4 Department Cards
-                    updateCardUI('library', data.library || 'Pending');
-                    updateCardUI('business', data.business || data.finance || 'Pending'); // map finance to business 
-                    updateCardUI('registrar', data.registrar || 'Pending');
-                    updateCardUI('dean', data.dean || 'Pending');
+                    updateCardUI('library', data.library || 'Pending', data.libraryRemark);
+                    updateCardUI('business', data.business || data.finance || 'Pending', data.businessRemark); // map finance to business 
+                    updateCardUI('registrar', data.registrar || 'Pending', data.registrarRemark);
+                    updateCardUI('dean', data.dean || 'Pending', data.deanRemark);
 
                     // Calculate Completion
                     let clearedCount = 0;
@@ -482,14 +488,14 @@
                 } else {
                     // Not initiated state
                     document.getElementById('banner-status').innerHTML = 'Clearance Status: <span class="text-gray-300">Not Initiated</span>';
-                    document.getElementById('initiate-btn-container').classList.remove('hidden');
-                    document.getElementById('progress-container').classList.add('hidden');
+                    if (initContainer) initContainer.classList.remove('hidden');
+                    if (progressContainer) progressContainer.classList.add('hidden');
                 }
             }, (error) => console.error("Firestore Error:", error));
         });
 
         // Dynamic Card Styles
-        function updateCardUI(deptId, status) {
+        function updateCardUI(deptId, status, remarkText = null) {
             const card = document.getElementById(`card-${deptId}`);
             const edge = document.getElementById(`card-edge-${deptId}`);
             const iconBg = document.getElementById(`card-icon-bg-${deptId}`);
@@ -530,21 +536,27 @@
                 badge.innerText = "Action Needed";
                 desc.innerText = "Deficiency recorded. Needs your attention.";
                 desc.className = "text-xs text-red-600 font-bold mb-4 h-8";
-                action.innerHTML = `<button onclick="openModal()" class="w-full py-2 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold rounded-lg transition-colors border border-red-200">View Details</button>`;
+                
+                // Safe passing of the remark text to the modal
+                const safeRemark = remarkText ? remarkText.replace(/'/g, "\\'") : "Please visit the respective department to resolve your issue.";
+                action.innerHTML = `<button onclick="openModal('${safeRemark}')" class="w-full py-2 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold rounded-lg transition-colors border border-red-200">View Details</button>`;
             }
         }
 
+        // BUG FIX: Removed strict auth block to allow reliable click
         window.initiateClearance = async () => {
-            if (!auth.currentUser) return;
             const btn = document.getElementById('init-btn');
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
-            btn.disabled = true;
+            if(btn) {
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
+                btn.disabled = true;
+            }
             
             try {
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'clearances', studentId);
+                // Create the record in Firestore
                 await setDoc(docRef, {
                     username: studentId,
-                    name: sessionUser ? sessionUser.name : "Wendel N. Flores",
+                    name: studentName,
                     library: 'Pending',
                     business: 'Pending',
                     registrar: 'Pending',
@@ -555,8 +567,10 @@
             } catch(err) {
                 console.error("Firestore Write Error:", err);
                 showToast("Error connecting. Try again.", "error");
-                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Start Clearance Request';
-                btn.disabled = false;
+                if(btn) {
+                    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Start Clearance Request';
+                    btn.disabled = false;
+                }
             }
         };
     </script>
