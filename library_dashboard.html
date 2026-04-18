@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwiftClear - Library Administration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        chmsu: { green: '#0C5E33', gold: '#FFC72C', dark: '#1F2937' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .sidebar-item-active { background: rgba(255, 255, 255, 0.1); border-left: 4px solid #FFC72C; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .request-card { animation: slideIn 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="bg-[#F8FAFC] min-h-screen flex">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-chmsu-green text-white hidden md:flex flex-col sticky top-0 h-screen shadow-2xl">
+        <div class="p-6 border-b border-white/10">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-chmsu-green font-bold shadow-lg">L</div>
+                <div>
+                    <h1 class="font-bold text-lg tracking-tight">SwiftClear</h1>
+                    <p class="text-[10px] text-chmsu-gold font-bold uppercase tracking-widest">Library Dept</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="flex-1 mt-6 px-4 space-y-2">
+            <a href="#" class="sidebar-item-active flex items-center gap-3 px-4 py-3 rounded-xl transition-all">
+                <i class="fa-solid fa-gauge-high"></i>
+                <span class="text-sm font-medium">Dashboard</span>
+            </a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/5 hover:text-white transition-all">
+                <i class="fa-solid fa-users"></i>
+                <span class="text-sm font-medium">Students</span>
+            </a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/5 hover:text-white transition-all">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span class="text-sm font-medium">History</span>
+            </a>
+        </nav>
+
+        <div class="p-6 border-t border-white/10">
+            <button onclick="logout()" class="flex items-center gap-3 text-red-300 hover:text-red-100 text-sm font-bold transition-colors">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col min-w-0">
+        <!-- Header -->
+        <header class="bg-white border-b px-8 py-4 flex justify-between items-center sticky top-0 z-10">
+            <div>
+                <h2 class="text-xl font-bold text-gray-800">Clearance Management</h2>
+                <p class="text-xs text-gray-400">Manage real-time library clearance requests</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-right">
+                    <p id="officer-name" class="text-sm font-bold text-gray-800">Librarian Admin</p>
+                    <p class="text-[10px] text-green-600 font-bold uppercase">Online & Syncing</p>
+                </div>
+                <div class="w-10 h-10 bg-chmsu-green/10 rounded-full flex items-center justify-center text-chmsu-green border border-chmsu-green/20">
+                    <i class="fa-solid fa-user-tie"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Stats -->
+        <div class="p-8 pb-4 grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-2 bg-orange-100 text-orange-600 rounded-lg"><i class="fa-solid fa-clock"></i></div>
+                    <span id="pending-count" class="text-2xl font-bold text-gray-800">0</span>
+                </div>
+                <p class="text-sm text-gray-500 font-medium">Pending Requests</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-2 bg-emerald-100 text-emerald-600 rounded-lg"><i class="fa-solid fa-circle-check"></i></div>
+                    <span id="approved-count" class="text-2xl font-bold text-gray-800">0</span>
+                </div>
+                <p class="text-sm text-gray-500 font-medium">Approved Today</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-2 bg-blue-100 text-blue-600 rounded-lg"><i class="fa-solid fa-bolt"></i></div>
+                    <span class="text-2xl font-bold text-gray-800">1.2s</span>
+                </div>
+                <p class="text-sm text-gray-500 font-medium">Avg. Sync Speed</p>
+            </div>
+        </div>
+
+        <!-- Request List Section -->
+        <div class="px-8 py-4 flex-1">
+            <div class="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden h-full flex flex-col">
+                <div class="px-6 py-4 border-b bg-gray-50/50 flex justify-between items-center">
+                    <h3 class="font-bold text-gray-700">Live Request Stream</h3>
+                    <span class="px-3 py-1 bg-chmsu-green text-white text-[10px] font-bold rounded-full animate-pulse">LIVE SYNC ON</span>
+                </div>
+                
+                <div id="request-list" class="overflow-y-auto p-6 space-y-4 flex-1">
+                    <!-- Loading State -->
+                    <div class="flex flex-col items-center justify-center h-full text-gray-400 gap-4">
+                        <i class="fa-solid fa-satellite-dish animate-bounce text-4xl"></i>
+                        <p class="text-sm font-medium">Connecting to university server...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'swiftclear-default';
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) { signInAnonymously(auth); return; }
+
+            const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'clearances');
+            
+            onSnapshot(colRef, (snapshot) => {
+                const list = document.getElementById('request-list');
+                let pendingCount = 0;
+                let approvedCount = 0;
+                
+                const requests = [];
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (data.library === 'Pending') {
+                        pendingCount++;
+                        requests.push(data);
+                    } else if (data.library === 'Approved') {
+                        approvedCount++;
+                    }
+                });
+
+                document.getElementById('pending-count').innerText = pendingCount;
+                document.getElementById('approved-count').innerText = approvedCount;
+
+                list.innerHTML = "";
+                if (requests.length === 0) {
+                    list.innerHTML = `
+                        <div class="flex flex-col items-center justify-center h-full text-gray-400 py-12">
+                            <i class="fa-solid fa-inbox text-5xl mb-4 opacity-20"></i>
+                            <p class="text-sm font-medium">All students cleared for now.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                requests.sort((a, b) => b.timestamp - a.timestamp).forEach(data => {
+                    const card = document.createElement('div');
+                    card.className = "request-card bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all flex items-center justify-between";
+                    card.innerHTML = `
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-chmsu-gold/10 text-chmsu-gold rounded-xl flex items-center justify-center font-bold">
+                                ${data.username.substring(0, 1).toUpperCase()}
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h4 class="font-bold text-gray-800">${data.username}</h4>
+                                    <span class="text-[9px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-bold">NEW</span>
+                                </div>
+                                <p class="text-xs text-gray-400">Requested ${new Date(data.timestamp).toLocaleTimeString()}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="viewDetails('${data.username}')" class="px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-lg transition-all">Details</button>
+                            <button onclick="approve('${data.username}')" class="bg-chmsu-green text-white px-5 py-2 rounded-lg text-xs font-bold hover:brightness-110 transition-all flex items-center gap-2 shadow-lg shadow-chmsu-green/20">
+                                <i class="fa-solid fa-check"></i> Approve
+                            </button>
+                        </div>
+                    `;
+                    list.appendChild(card);
+                });
+            }, (err) => {
+                console.error(err);
+                document.getElementById('request-list').innerHTML = `<p class="text-red-500 p-4">Connection error. Check console.</p>`;
+            });
+        });
+
+        window.approve = async (studentId) => {
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'clearances', studentId);
+                await updateDoc(docRef, { library: 'Approved' });
+            } catch (e) {
+                console.error("Approval failed:", e);
+            }
+        };
+
+        window.viewDetails = (id) => {
+            // Placeholder for a modal or detail view
+            console.log("Viewing student:", id);
+        };
+
+        window.logout = () => { localStorage.clear(); window.location.href = 'login.html'; };
+    </script>
+</body>
+</html>
