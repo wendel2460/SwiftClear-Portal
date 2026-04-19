@@ -36,6 +36,15 @@
 </head>
 <body class="flex h-screen overflow-hidden">
 
+    <!-- Auth Guard Pre-Check (Runs immediately to prevent URL bypassing) -->
+    <script>
+        const checkUser = JSON.parse(localStorage.getItem('sc_user'));
+        // Only allow users with the 'Business Office' role to access this page
+        if (!checkUser || !checkUser.username || checkUser.role !== 'Business Office') {
+            window.location.replace('login.html'); 
+        }
+    </script>
+
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
 
@@ -141,11 +150,11 @@
                 <div class="h-8 w-px bg-gray-200 mx-2"></div>
                 <div class="flex items-center gap-3">
                     <div class="text-right hidden sm:block">
-                        <p class="text-sm font-bold text-gray-800">Mr. Cruz</p>
+                        <p id="nav-display-name" class="text-sm font-bold text-gray-800">Loading...</p>
                         <p class="text-xs text-green-600 font-bold uppercase">Online & Syncing</p>
                     </div>
-                    <div class="w-10 h-10 rounded-full bg-chmsu-gold/20 flex items-center justify-center text-yellow-700 font-bold border border-yellow-200">
-                        JC
+                    <div id="nav-avatar" class="w-10 h-10 rounded-full bg-chmsu-gold/20 flex items-center justify-center text-yellow-700 font-bold border border-yellow-200">
+                        ?
                     </div>
                 </div>
             </div>
@@ -286,6 +295,19 @@
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'swiftclear-6195d';
 
+        // --- DYNAMIC USER DATA ---
+        let sessionUser = { name: 'Accounting Officer' };
+        try {
+            const saved = JSON.parse(localStorage.getItem('sc_user'));
+            if(saved && saved.name) sessionUser = saved;
+        } catch(e) {}
+        
+        const adminName = sessionUser.name;
+        const adminInitials = adminName.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+        
+        document.getElementById('nav-display-name').innerText = adminName;
+        document.getElementById('nav-avatar').innerText = adminInitials;
+
         // --- UI & Utility Functions attached to window ---
         window.toggleSidebar = () => {
             document.getElementById('sidebar').classList.toggle('-translate-x-full');
@@ -327,11 +349,7 @@
         // --- Firebase Real-time Integration ---
         const initAuth = async () => {
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                if (!auth.currentUser) await signInAnonymously(auth);
             } catch (err) { console.error("Auth Error:", err); }
         };
         initAuth();
@@ -424,7 +442,7 @@
         window.approve = async (studentId) => {
             try {
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'clearances', studentId);
-                // We update 'business' since student dashboard listens for either 'business' or 'finance'
+                // Update 'business' to match the listener
                 await updateDoc(docRef, { business: 'Approved' });
                 window.showToast(`Financial clearance approved for ${studentId}.`, 'success');
             } catch (e) {
