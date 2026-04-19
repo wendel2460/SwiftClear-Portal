@@ -16,15 +16,9 @@
             theme: {
                 extend: {
                     colors: {
-                        chmsu: {
-                            green: '#0C5E33',
-                            gold: '#FFC72C',
-                            dark: '#1F2937'
-                        }
+                        chmsu: { green: '#0C5E33', gold: '#FFC72C', dark: '#1F2937' }
                     },
-                    fontFamily: {
-                        sans: ['Poppins', 'sans-serif'],
-                    }
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] }
                 }
             }
         }
@@ -35,23 +29,14 @@
         .bg-pattern {
             background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
         }
-        .form-transition {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .hide-form {
-            opacity: 0;
-            transform: translateY(10px);
-            pointer-events: none;
-            position: absolute;
-            visibility: hidden;
-        }
-        .show-form {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto;
-            position: relative;
-            visibility: visible;
-        }
+        .form-transition { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .hide-form { opacity: 0; transform: translateY(10px); pointer-events: none; position: absolute; visibility: hidden; }
+        .show-form { opacity: 1; transform: translateY(0); pointer-events: auto; position: relative; visibility: visible; }
+        
+        /* Custom Scrollbar for Form */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
@@ -59,7 +44,7 @@
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
 
-    <div class="max-w-5xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+    <div class="max-w-5xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[600px] max-h-[90vh]">
         
         <!-- Left Side: Branding / Info -->
         <div class="md:w-5/12 bg-gradient-to-br from-chmsu-green to-[#084223] text-white p-10 flex flex-col justify-between relative overflow-hidden bg-pattern">
@@ -97,14 +82,13 @@
         </div>
 
         <!-- Right Side: Forms -->
-        <div class="md:w-7/12 p-8 md:p-12 relative flex items-center justify-center bg-white">
+        <div class="md:w-7/12 p-8 md:p-12 relative flex items-center justify-center bg-white overflow-hidden">
             
-            <!-- Link to your GitHub Pages Documentation -->
             <a href="https://wendel2460.github.io/SwiftClear-Docs/" target="_blank" class="absolute top-6 right-6 text-xs sm:text-sm text-gray-500 hover:text-chmsu-green font-medium flex items-center gap-2 transition-colors bg-gray-50 hover:bg-green-50 px-3 py-1.5 rounded-full border border-gray-200 shadow-sm z-20">
                 <i class="fa-solid fa-book-open"></i> <span class="hidden sm:inline">Documentation</span>
             </a>
 
-            <div class="w-full max-w-md relative">
+            <div class="w-full max-w-md relative flex flex-col h-full justify-center">
                 
                 <!-- ================= LOGIN FORM ================= -->
                 <div id="login-form" class="form-transition show-form">
@@ -157,83 +141,138 @@
                 </div>
 
                 <!-- ================= SIGN UP FORM ================= -->
-                <div id="signup-form" class="form-transition hide-form">
-                    <div class="text-center mb-6">
+                <div id="signup-form" class="form-transition hide-form flex flex-col h-full">
+                    <div class="text-center mb-4 flex-shrink-0">
                         <h2 class="text-2xl font-bold text-gray-800">Create Account</h2>
-                        <p class="text-sm text-gray-500 mt-2">Register to start your clearance process</p>
+                        <p class="text-sm text-gray-500 mt-1">Register to start your clearance process</p>
                     </div>
 
-                    <form onsubmit="handleSignup(event)" class="space-y-4">
+                    <!-- Scrollable Form Area -->
+                    <form onsubmit="handleSignup(event)" class="space-y-4 overflow-y-auto custom-scrollbar pr-2 pb-2" style="max-height: 55vh;">
+                        
+                        <!-- Name Block -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">First Name</label>
+                                <input type="text" id="signup-first" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="Juan">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Middle Name</label>
+                                <input type="text" id="signup-middle" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="Santos">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Last Name</label>
+                                <input type="text" id="signup-last" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="Dela Cruz">
+                            </div>
+                        </div>
+
+                        <!-- ID & Contact -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Student ID</label>
+                                <input type="text" id="signup-id" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="2024-XXXXX">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Contact Number</label>
+                                <input type="tel" id="signup-contact" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="09XX XXX XXXX">
+                            </div>
+                        </div>
+
+                        <!-- Course / Program Dropdown -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i class="fa-regular fa-id-card text-gray-400"></i>
-                                </div>
-                                <input type="text" id="signup-name" required class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all" placeholder="Juan Dela Cruz">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Course / Program</label>
+                            <select id="signup-course" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm bg-white">
+                                <option value="" disabled selected>Select your program...</option>
+                                <optgroup label="Arts, Science & Public Admin">
+                                    <option value="BAEL">Bachelor of Arts in English Language</option>
+                                    <option value="BASS">Bachelor of Arts in Social Science</option>
+                                    <option value="BPA">Bachelor of Public Administration</option>
+                                    <option value="BSAM">Bachelor of Science in Applied Mathematics</option>
+                                    <option value="BSP">Bachelor of Science in Psychology</option>
+                                </optgroup>
+                                <optgroup label="Business & Management">
+                                    <option value="BSHM">Bachelor of Science in Hospitality Management</option>
+                                    <option value="BSOA">Bachelor of Science in Office Administration</option>
+                                    <option value="BSIS">Bachelor of Science in Information Systems</option>
+                                </optgroup>
+                                <optgroup label="Education">
+                                    <option value="BECEd">Bachelor of Early Childhood Education</option>
+                                    <option value="BEEd">Bachelor of Elementary Education</option>
+                                    <option value="BPEd">Bachelor of Physical Education</option>
+                                    <option value="BSNEd">Bachelor of Special Needs Education</option>
+                                </optgroup>
+                                <optgroup label="Secondary Education">
+                                    <option value="BSEd-English">BSEd - Major in English</option>
+                                    <option value="BSEd-Filipino">BSEd - Major in Filipino</option>
+                                    <option value="BSEd-Math">BSEd - Major in Mathematics</option>
+                                    <option value="BSEd-Science">BSEd - Major in Science</option>
+                                </optgroup>
+                                <optgroup label="Tech & Livelihood Education">
+                                    <option value="BTLEd-HE">BTLEd - Home Economics</option>
+                                    <option value="BTLEd-IA">BTLEd - Industrial Arts</option>
+                                </optgroup>
+                                <optgroup label="Engineering & Technology">
+                                    <option value="BSCE">Bachelor of Science in Civil Engineering</option>
+                                    <option value="BIT-ArchDrafting">BIT - Architectural Drafting</option>
+                                    <option value="BIT-Automotive">BIT - Automotive Technology</option>
+                                    <option value="BIT-Electrical">BIT - Electrical Technology</option>
+                                    <option value="BIT-Electronics">BIT - Electronics Technology</option>
+                                    <option value="BIT-Apparel">BIT - Apparel & Fashion Tech</option>
+                                    <option value="BIT-Culinary">BIT - Culinary Technology</option>
+                                    <option value="BIT-Mechanical">BIT - Mechanical Technology</option>
+                                    <option value="BIT-HVACR">BIT - HVACR</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <!-- Year & Section Dropdowns -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Year Level</label>
+                                <select id="signup-year" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm bg-white">
+                                    <option value="" disabled selected>Select Year</option>
+                                    <option value="1">1st Year</option>
+                                    <option value="2">2nd Year</option>
+                                    <option value="3">3rd Year</option>
+                                    <option value="4">4th Year</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Section</label>
+                                <select id="signup-section" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm bg-white">
+                                    <option value="" disabled selected>Select Section</option>
+                                    <option value="A">A</option>
+                                    <option value="B">B</option>
+                                    <option value="C">C</option>
+                                    <option value="D">D</option>
+                                </select>
                             </div>
                         </div>
 
-                        <!-- Grid for ID and Contact Number -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Student ID</label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i class="fa-solid fa-id-badge text-gray-400"></i>
-                                    </div>
-                                    <input type="text" id="signup-id" required class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all" placeholder="2024-XXXXX">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i class="fa-solid fa-phone text-gray-400"></i>
-                                    </div>
-                                    <input type="tel" id="signup-contact" required class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all" placeholder="09XX XXX XXXX">
-                                </div>
-                            </div>
-                        </div>
-
+                        <!-- Email -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i class="fa-regular fa-envelope text-gray-400"></i>
-                                </div>
-                                <input type="email" id="signup-email" required class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all" placeholder="student@chmsu.edu.ph">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Email Address</label>
+                            <input type="email" id="signup-email" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="student@chmsu.edu.ph">
+                        </div>
+
+                        <!-- Passwords -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Password</label>
+                                <input type="password" id="signup-password" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="••••••••">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Confirm</label>
+                                <input type="password" id="signup-confirm" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="••••••••">
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i class="fa-solid fa-lock text-gray-400"></i>
-                                    </div>
-                                    <input type="password" id="signup-password" required class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all" placeholder="••••••••">
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Confirm</label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i class="fa-solid fa-check-double text-gray-400"></i>
-                                    </div>
-                                    <input type="password" id="signup-confirm" required class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all" placeholder="••••••••">
-                                </div>
-                            </div>
-                        </div>
-
-                        <button id="signup-btn" type="submit" class="w-full bg-chmsu-green hover:bg-[#084223] text-white font-bold py-3 rounded-xl transition-all transform hover:-translate-y-0.5 mt-2 shadow-lg shadow-green-900/20 flex justify-center gap-2">
+                        <button id="signup-btn" type="submit" class="w-full bg-chmsu-green hover:bg-[#084223] text-white font-bold py-3 rounded-xl transition-all shadow-lg mt-4 flex justify-center items-center gap-2">
                             Create Account
                         </button>
                     </form>
 
-                    <p class="mt-6 text-center text-sm text-gray-600">
+                    <p class="mt-4 flex-shrink-0 text-center text-sm text-gray-600">
                         Already have an account? 
                         <button type="button" onclick="toggleForms('login')" class="font-bold text-chmsu-green hover:underline">Sign In</button>
                     </p>
@@ -264,7 +303,7 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="w-full bg-chmsu-green hover:bg-[#084223] text-white font-bold py-3 rounded-xl transition-all transform hover:-translate-y-0.5 shadow-lg shadow-green-900/20">
+                        <button type="submit" class="w-full bg-chmsu-green hover:bg-[#084223] text-white font-bold py-3 rounded-xl transition-all shadow-lg">
                             Send Reset Link
                         </button>
                     </form>
@@ -309,7 +348,7 @@
 
         // Base demo users
         const mockUsers = {
-            'wendel_f': { password: 'pass123', role: 'Student', name: 'Wendel N. Flores', redirect: 'student_dashboard.html' },
+            'wendel_f': { password: 'pass123', role: 'Student', name: 'Wendel N. Flores', details: 'BSIS 2-B', redirect: 'student_dashboard.html' },
             'reg': { password: 'pass123', role: 'Registrar', name: 'Registrar Admin', redirect: 'registrar_dashboard.html' },
             'lib': { password: 'pass123', role: 'Library', name: 'Chief Librarian', redirect: 'library_dashboard.html' },
             'bus': { password: 'pass123', role: 'Business Office', name: 'Accounting Officer', redirect: 'business_dashboard.html' },
@@ -320,11 +359,23 @@
 
         window.handleSignup = async (e) => {
             e.preventDefault();
-            const fullName = document.getElementById('signup-name').value.trim();
+            
+            // Gather all new detailed fields
+            const fName = document.getElementById('signup-first').value.trim();
+            const mName = document.getElementById('signup-middle').value.trim();
+            const lName = document.getElementById('signup-last').value.trim();
+            
             const studentId = document.getElementById('signup-id').value.trim();
             const contact = document.getElementById('signup-contact').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            
+            const course = document.getElementById('signup-course').value;
+            const year = document.getElementById('signup-year').value;
+            const section = document.getElementById('signup-section').value;
+            
             const password = document.getElementById('signup-password').value;
             const confirm = document.getElementById('signup-confirm').value;
+            
             const btn = document.getElementById('signup-btn');
 
             if (password !== confirm) {
@@ -337,17 +388,19 @@
                 return;
             }
 
+            // Construct merged data strings
+            const fullName = `${fName} ${mName} ${lName}`.replace(/\s+/g, ' ').trim();
+            const courseDetails = `${course} ${year}-${section}`; // Example: BSIS 2-B
+
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
             btn.disabled = true;
 
             try {
-                // Ensure auth is ready
                 if (!auth.currentUser) await signInAnonymously(auth);
 
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', studentId);
                 const docSnap = await getDoc(docRef);
 
-                // BUG FIX: Check if account exists in database to prevent duplicates
                 if (docSnap.exists()) {
                     window.showToast("An account with this Student ID already exists!", "error");
                     btn.innerHTML = 'Create Account';
@@ -355,12 +408,20 @@
                     return;
                 }
 
-                // Save to LIVE FIREBASE DATABASE
+                // Save merged details to LIVE FIREBASE DATABASE
                 await setDoc(docRef, {
                     password: password, 
                     role: 'Student',
                     name: fullName,
+                    firstName: fName,
+                    middleName: mName,
+                    lastName: lName,
                     contact: contact,
+                    email: email,
+                    course: course,
+                    yearLevel: year,
+                    section: section,
+                    details: courseDetails, // We use this in the dashboard badge!
                     redirect: 'student_dashboard.html',
                     createdAt: Date.now()
                 });
@@ -399,7 +460,8 @@
                     localStorage.setItem('sc_user', JSON.stringify({ 
                         username: username, 
                         name: user.name, 
-                        role: user.role 
+                        role: user.role,
+                        details: user.details || user.role 
                     }));
                     window.showToast(`Welcome, ${user.name}! Redirecting...`, 'success');
                     setTimeout(() => { window.location.href = user.redirect; }, 1000);
@@ -422,10 +484,12 @@
                 if (docSnap.exists()) {
                     const userData = docSnap.data();
                     if (userData.password === password) {
+                        // Include the 'details' tag which holds the "BSIS 2-B" string
                         localStorage.setItem('sc_user', JSON.stringify({ 
                             username: username, 
                             name: userData.name, 
-                            role: userData.role 
+                            role: userData.role,
+                            details: userData.details || userData.role
                         }));
                         window.showToast(`Welcome, ${userData.name}!`, 'success');
                         setTimeout(() => { window.location.href = userData.redirect; }, 1000);
@@ -503,7 +567,7 @@
             toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span class="font-medium text-sm">${message}</span>`;
             
             container.appendChild(toast);
-            setTimeout(() => toast.classList.remove('translate-y-[-20px]', 'opacity-0'), 10);
+            setTimeout(() => toast.classList.remove('opacity-0', 'translate-y-[-20px]'), 10);
             setTimeout(() => {
                 toast.classList.add('opacity-0');
                 setTimeout(() => toast.remove(), 300);
