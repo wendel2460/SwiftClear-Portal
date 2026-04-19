@@ -374,7 +374,7 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'swiftclear-6195d';
 
         // --- DYNAMIC USER DATA ---
-        let sessionUser = { username: 'wendel_f', name: 'Wendel N. Flores' };
+        let sessionUser = { username: 'wendel_f', name: 'Wendel N. Flores', details: 'BSIS 2-B' };
         try {
             const saved = JSON.parse(localStorage.getItem('sc_user'));
             if(saved && saved.username) sessionUser = saved;
@@ -382,14 +382,15 @@
         
         const studentId = sessionUser.username;
         const studentName = sessionUser.name || studentId;
-        const studentRole = sessionUser.role || 'Student';
+        // Dynamically insert the details passed from the new registration form (e.g. BSIS 2-B)
+        const studentDetails = sessionUser.details || sessionUser.role || 'Student';
 
         // Apply dynamic names to the UI
         document.getElementById('nav-display-name').innerText = studentName;
         document.getElementById('nav-avatar').innerText = studentName.charAt(0).toUpperCase();
         document.getElementById('welcome-name').innerText = studentName;
         document.getElementById('badge-student-id').innerText = `ID: ${studentId}`;
-        document.getElementById('badge-student-role').innerText = studentRole;
+        document.getElementById('badge-student-role').innerText = studentDetails;
 
         // UI & Tab Helpers attached to window
         window.switchTab = (tabId) => {
@@ -581,7 +582,7 @@
                 
                 // Safe passing of the remark text to the modal
                 const safeRemark = remarkText ? remarkText.replace(/'/g, "\\'") : "Please visit the respective department to resolve your issue.";
-                action.innerHTML = `<button onclick="window.openModal('${safeRemark}')" class="w-full py-2 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold rounded-lg transition-colors border border-red-200">View Details</button>`;
+                action.innerHTML = `<button onclick="openModal('${safeRemark}')" class="w-full py-2 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold rounded-lg transition-colors border border-red-200">View Details</button>`;
             }
         }
 
