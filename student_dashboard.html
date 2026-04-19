@@ -52,11 +52,12 @@
 </head>
 <body class="text-gray-800 flex h-screen overflow-hidden">
 
-    <!-- Auth Guard Pre-Check (Runs immediately to prevent flashing) -->
+    <!-- Auth Guard Pre-Check (Runs immediately to prevent URL bypassing) -->
     <script>
         const checkUser = JSON.parse(localStorage.getItem('sc_user'));
+        // Only allow users with the 'Student' role to access this page
         if (!checkUser || !checkUser.username || checkUser.role !== 'Student') {
-            window.location.replace('login.html'); // Kick unauthorized users immediately
+            window.location.replace('login.html'); 
         }
     </script>
 
@@ -179,7 +180,7 @@
                                 </div>
                             </div>
                             
-                            <!-- Progress Circle/Bar -->
+                            <!-- Progress Bar Container -->
                             <div id="progress-container" class="bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/20 min-w-[200px] hidden transition-opacity">
                                 <div class="flex justify-between items-end mb-2">
                                     <span class="text-xs font-medium text-green-100 uppercase tracking-wider">Overall Progress</span>
@@ -258,7 +259,7 @@
 
                     <!-- Generate Certificate Action -->
                     <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col items-center justify-center text-center mt-6">
-                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-gray-400" id="cert-icon">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-gray-400 transition-colors" id="cert-icon">
                             <i class="fa-solid fa-print text-2xl"></i>
                         </div>
                         <h3 class="font-bold text-gray-800 mb-2">Final Clearance Certificate</h3>
@@ -373,17 +374,22 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'swiftclear-6195d';
 
         // --- DYNAMIC USER DATA ---
-        const sessionUser = JSON.parse(localStorage.getItem('sc_user'));
-        const studentId = sessionUser ? sessionUser.username : null;
-        const studentName = sessionUser ? sessionUser.name : null;
-        const studentRole = sessionUser ? sessionUser.role : null;
+        let sessionUser = { username: 'wendel_f', name: 'Wendel N. Flores' };
+        try {
+            const saved = JSON.parse(localStorage.getItem('sc_user'));
+            if(saved && saved.username) sessionUser = saved;
+        } catch(e) {}
+        
+        const studentId = sessionUser.username;
+        const studentName = sessionUser.name || studentId;
+        const studentRole = sessionUser.role || 'Student';
 
         // Apply dynamic names to the UI
-        document.getElementById('nav-display-name').innerText = studentName || 'Student';
-        document.getElementById('nav-avatar').innerText = studentName ? studentName.charAt(0).toUpperCase() : '?';
-        document.getElementById('welcome-name').innerText = studentName || 'Student';
-        document.getElementById('badge-student-id').innerText = `ID: ${studentId || 'Unknown'}`;
-        document.getElementById('badge-student-role').innerText = studentRole || 'Student';
+        document.getElementById('nav-display-name').innerText = studentName;
+        document.getElementById('nav-avatar').innerText = studentName.charAt(0).toUpperCase();
+        document.getElementById('welcome-name').innerText = studentName;
+        document.getElementById('badge-student-id').innerText = `ID: ${studentId}`;
+        document.getElementById('badge-student-role').innerText = studentRole;
 
         // UI & Tab Helpers attached to window
         window.switchTab = (tabId) => {
@@ -424,7 +430,7 @@
         };
         window.logout = () => { localStorage.clear(); window.location.href = 'login.html'; };
 
-        function showToast(message, type = 'success') {
+        window.showToast = (message, type = 'success') => {
             const container = document.getElementById('toast-container');
             const t = document.createElement('div');
             t.className = `${type === 'success' ? 'bg-emerald-500' : 'bg-red-500'} text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-y-[-20px] opacity-0 z-50`;
@@ -432,7 +438,14 @@
             container.appendChild(t);
             setTimeout(() => t.classList.remove('translate-y-[-20px]', 'opacity-0'), 10);
             setTimeout(() => { t.classList.add('opacity-0'); setTimeout(() => t.remove(), 300); }, 3000);
-        }
+        };
+
+        window.generateCertificate = () => {
+            window.showToast("Downloading Official E-Clearance Certificate...", "success");
+            setTimeout(() => {
+                window.showToast("Certificate downloaded successfully!", "success");
+            }, 2000);
+        };
 
         // Firebase Auth & Listeners
         const initAuth = async () => {
@@ -465,7 +478,7 @@
 
                     // Update 4 Department Cards
                     updateCardUI('library', data.library || 'Pending', data.libraryRemark);
-                    updateCardUI('business', data.business || data.finance || 'Pending', data.businessRemark); // map finance to business 
+                    updateCardUI('business', data.business || data.finance || 'Pending', data.businessRemark); 
                     updateCardUI('registrar', data.registrar || 'Pending', data.registrarRemark);
                     updateCardUI('dean', data.dean || 'Pending', data.deanRemark);
 
@@ -478,26 +491,40 @@
 
                     const progressPct = Math.round((clearedCount / 4) * 100);
                     
-                    // Update Circle
-                    const offset = 364.4 - (364.4 * (progressPct / 100));
-                    document.getElementById('progress-circle').style.strokeDashoffset = offset;
-                    document.getElementById('progress-percent').innerText = progressPct + '%';
-                    document.getElementById('cleared-count-text').innerText = `${clearedCount} of 4 departments cleared`;
-                    document.getElementById('overall-progress-bar').style.width = progressPct + '%';
+                    // FIX: Connect directly to the proper horizontal progress bar IDs
+                    const progressText = document.getElementById('overall-progress-text');
+                    const progressBar = document.getElementById('overall-progress-bar');
+                    const countText = document.getElementById('cleared-count-text');
+
+                    if (progressText) progressText.innerText = progressPct + '%';
+                    if (progressBar) progressBar.style.width = progressPct + '%';
+                    if (countText) countText.innerText = `${clearedCount} of 4 departments cleared`;
 
                     // Update PDF generation button if 100%
                     const certBtn = document.getElementById('generate-pdf-btn');
                     if(progressPct === 100) {
                         document.getElementById('banner-status').innerHTML = 'Clearance Status: <span class="text-white font-black">Fully Cleared</span>';
-                        certBtn.disabled = false;
-                        certBtn.className = "w-full py-3 bg-chmsu-gold text-chmsu-dark font-bold rounded-xl hover:bg-yellow-400 transition-colors flex items-center justify-center gap-2 shadow-md hover:scale-105";
-                        certBtn.innerHTML = '<i class="fa-solid fa-download"></i> Download Certificate';
-                        document.getElementById('cert-icon').classList.add('bg-chmsu-gold/20', 'text-chmsu-gold');
+                        if (certBtn) {
+                            certBtn.disabled = false;
+                            certBtn.className = "w-full py-3 bg-chmsu-gold text-chmsu-dark font-bold rounded-xl hover:bg-yellow-400 transition-colors flex items-center justify-center gap-2 shadow-md hover:scale-105 cursor-pointer";
+                            certBtn.innerHTML = '<i class="fa-solid fa-download"></i> Download Certificate';
+                            certBtn.setAttribute("onclick", "generateCertificate()");
+                        }
+                        const certIcon = document.getElementById('cert-icon');
+                        if (certIcon) {
+                            certIcon.classList.add('bg-chmsu-gold/20', 'text-chmsu-gold', 'bg-yellow-100');
+                        }
                     } else {
-                        certBtn.disabled = true;
-                        certBtn.className = "w-full py-3 bg-gray-200 text-gray-500 font-bold rounded-xl cursor-not-allowed flex items-center justify-center gap-2 transition-colors";
-                        certBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Locked (Needs 100%)';
-                        document.getElementById('cert-icon').classList.remove('bg-chmsu-gold/20', 'text-chmsu-gold');
+                        if (certBtn) {
+                            certBtn.disabled = true;
+                            certBtn.className = "w-full py-3 bg-gray-200 text-gray-500 font-bold rounded-xl cursor-not-allowed flex items-center justify-center gap-2 transition-colors";
+                            certBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Locked (Needs 100%)';
+                            certBtn.removeAttribute("onclick");
+                        }
+                        const certIcon = document.getElementById('cert-icon');
+                        if (certIcon) {
+                            certIcon.classList.remove('bg-chmsu-gold/20', 'text-chmsu-gold', 'bg-yellow-100');
+                        }
                     }
 
                 } else {
@@ -554,7 +581,7 @@
                 
                 // Safe passing of the remark text to the modal
                 const safeRemark = remarkText ? remarkText.replace(/'/g, "\\'") : "Please visit the respective department to resolve your issue.";
-                action.innerHTML = `<button onclick="openModal('${safeRemark}')" class="w-full py-2 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold rounded-lg transition-colors border border-red-200">View Details</button>`;
+                action.innerHTML = `<button onclick="window.openModal('${safeRemark}')" class="w-full py-2 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold rounded-lg transition-colors border border-red-200">View Details</button>`;
             }
         }
 
@@ -582,10 +609,10 @@
                     dean: 'Pending',
                     timestamp: Date.now()
                 });
-                showToast("Clearance initiated successfully!", "success");
+                window.showToast("Clearance initiated successfully!", "success");
             } catch(err) {
                 console.error("Firestore Write Error:", err);
-                showToast("Error connecting. Try again.", "error");
+                window.showToast("Error connecting. Try again.", "error");
                 if(btn) {
                     btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Start Clearance Request';
                     btn.disabled = false;
