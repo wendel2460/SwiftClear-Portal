@@ -52,6 +52,14 @@
 </head>
 <body class="text-gray-800 flex h-screen overflow-hidden">
 
+    <!-- Auth Guard Pre-Check (Runs immediately to prevent flashing) -->
+    <script>
+        const checkUser = JSON.parse(localStorage.getItem('sc_user'));
+        if (!checkUser || !checkUser.username || checkUser.role !== 'Student') {
+            window.location.replace('login.html'); // Kick unauthorized users immediately
+        }
+    </script>
+
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
 
@@ -154,7 +162,14 @@
                         
                         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                             <div>
+                                <h2 class="text-xl font-medium mb-1">Hello, <span id="welcome-name" class="font-bold text-chmsu-gold">Student</span>!</h2>
                                 <h1 id="banner-status" class="text-2xl lg:text-3xl font-bold mb-2">Clearance Status: <span class="text-gray-300">Checking...</span></h1>
+                                
+                                <div class="mt-4 flex gap-2 mb-4">
+                                    <span id="badge-student-id" class="px-3 py-1 bg-white/20 text-white text-[10px] font-bold rounded-full">ID: Loading...</span>
+                                    <span id="badge-student-role" class="px-3 py-1 bg-chmsu-gold text-chmsu-dark text-[10px] font-bold rounded-full">Student</span>
+                                </div>
+
                                 <p class="text-green-100 text-sm max-w-lg">Complete your departmental requirements to generate your final clearance certificate for the current semester.</p>
                                 
                                 <div id="initiate-btn-container" class="hidden mt-5">
@@ -321,7 +336,7 @@
                 </div>
                 
                 <div class="mb-6">
-                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Instructions</label>
+                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Instructions / Remarks</label>
                     <p id="modal-instructions-text" class="text-sm text-gray-800 bg-gray-50 p-3 rounded-lg border border-gray-200">
                         A clearing officer has flagged your account. Please visit the respective department to resolve this issue to proceed with your clearance.
                     </p>
@@ -357,18 +372,18 @@
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'swiftclear-6195d';
 
-        // BUG FIX: Getting user dynamically from local storage
-        let sessionUser = { username: 'wendel_f', name: 'Wendel N. Flores' };
-        try {
-            const saved = JSON.parse(localStorage.getItem('sc_user'));
-            if(saved && saved.username) sessionUser = saved;
-        } catch(e) {}
-        
-        const studentId = sessionUser.username;
-        const studentName = sessionUser.name || studentId;
-        
-        document.getElementById('nav-display-name').innerText = studentName;
-        document.getElementById('nav-avatar').innerText = studentName.charAt(0).toUpperCase();
+        // --- DYNAMIC USER DATA ---
+        const sessionUser = JSON.parse(localStorage.getItem('sc_user'));
+        const studentId = sessionUser ? sessionUser.username : null;
+        const studentName = sessionUser ? sessionUser.name : null;
+        const studentRole = sessionUser ? sessionUser.role : null;
+
+        // Apply dynamic names to the UI
+        document.getElementById('nav-display-name').innerText = studentName || 'Student';
+        document.getElementById('nav-avatar').innerText = studentName ? studentName.charAt(0).toUpperCase() : '?';
+        document.getElementById('welcome-name').innerText = studentName || 'Student';
+        document.getElementById('badge-student-id').innerText = `ID: ${studentId || 'Unknown'}`;
+        document.getElementById('badge-student-role').innerText = studentRole || 'Student';
 
         // UI & Tab Helpers attached to window
         window.switchTab = (tabId) => {
@@ -543,8 +558,12 @@
             }
         }
 
-        // BUG FIX: Removed strict auth block to allow reliable click
         window.initiateClearance = async () => {
+            // Ensure auth is initialized before writing
+            if (!auth.currentUser) {
+                await signInAnonymously(auth);
+            }
+
             const btn = document.getElementById('init-btn');
             if(btn) {
                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
