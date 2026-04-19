@@ -275,7 +275,8 @@
     <!-- Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        // FIX: The missing onAuthStateChanged & signInWithCustomToken are now properly imported!
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Setup Firebase
@@ -296,7 +297,7 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'swiftclear-6195d';
 
         // --- DYNAMIC USER DATA ---
-        let sessionUser = { name: 'Library Admin' };
+        let sessionUser = { name: 'Chief Librarian' };
         try {
             const saved = JSON.parse(localStorage.getItem('sc_user'));
             if(saved && saved.name) sessionUser = saved;
@@ -349,7 +350,11 @@
         // --- Firebase Real-time Integration ---
         const initAuth = async () => {
             try {
-                if (!auth.currentUser) await signInAnonymously(auth);
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
             } catch (err) { console.error("Auth Error:", err); }
         };
         initAuth();
