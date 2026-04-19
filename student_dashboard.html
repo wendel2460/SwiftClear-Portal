@@ -95,7 +95,7 @@
 
         <div class="p-4 border-t border-gray-800">
             <button onclick="switchTab('settings')" id="nav-settings" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-xl font-medium transition-colors text-left">
-                <i class="fa-solid fa-gear w-5 text-center"></i> Settings
+                <i class="fa-solid fa-user w-5 text-center"></i> Account Settings
             </button>
             <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-3 mt-1 text-red-400 hover:bg-gray-800 hover:text-red-300 rounded-xl font-medium transition-colors text-left">
                 <i class="fa-solid fa-right-from-bracket w-5 text-center"></i> Sign Out
@@ -289,27 +289,63 @@
                 <!-- ==================== VIEW: NOTIFICATIONS ==================== -->
                 <div id="view-notifications" class="tab-content hidden fade-in max-w-3xl mx-auto">
                     <h2 class="text-xl font-bold text-gray-800 mb-6">Notifications</h2>
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center text-gray-500">
-                        <i class="fa-regular fa-bell text-4xl mb-3 text-gray-300"></i>
-                        <p>No new notifications at this time.</p>
+                    <div id="notifications-list" class="space-y-4">
+                        <!-- Populated Dynamically via JavaScript -->
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center text-gray-500">
+                            <i class="fa-regular fa-bell text-4xl mb-3 text-gray-300"></i>
+                            <p>No new notifications at this time.</p>
+                        </div>
                     </div>
                 </div>
 
                 <!-- ==================== VIEW: HISTORY ==================== -->
                 <div id="view-history" class="tab-content hidden fade-in max-w-3xl mx-auto">
                     <h2 class="text-xl font-bold text-gray-800 mb-6">Activity History</h2>
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center text-gray-500">
-                        <i class="fa-solid fa-clock-rotate-left text-4xl mb-3 text-gray-300"></i>
-                        <p>Your recent activities and timeline events will be logged here.</p>
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 pt-10">
+                        <div class="relative border-l-2 border-gray-200 ml-4 space-y-8" id="history-timeline">
+                            <!-- Populated Dynamically via JavaScript -->
+                            <p class="text-gray-500 text-center py-4">Loading your account history...</p>
+                        </div>
                     </div>
                 </div>
 
-                <!-- ==================== VIEW: SETTINGS ==================== -->
+                <!-- ==================== VIEW: SETTINGS / PROFILE ==================== -->
                 <div id="view-settings" class="tab-content hidden fade-in max-w-3xl mx-auto">
-                    <h2 class="text-xl font-bold text-gray-800 mb-6">Account Settings</h2>
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center text-gray-500">
-                        <i class="fa-solid fa-gear text-4xl mb-3 text-gray-300"></i>
-                        <p>Profile configuration and system preferences coming soon.</p>
+                    <h2 class="text-xl font-bold text-gray-800 mb-6">Student Profile</h2>
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+                        <div class="flex items-center gap-6 mb-8 border-b border-gray-100 pb-6">
+                            <div id="profile-avatar" class="w-20 h-20 rounded-full bg-chmsu-green text-white flex items-center justify-center text-3xl font-bold shadow-md">?</div>
+                            <div>
+                                <h3 id="profile-name" class="text-2xl font-bold text-gray-800">Loading...</h3>
+                                <p class="text-sm text-chmsu-green font-medium">Active Student</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-10">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Student ID</label>
+                                <div id="profile-id" class="text-gray-800 font-medium pb-2 border-b border-gray-100">...</div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Course / Program</label>
+                                <div id="profile-course" class="text-gray-800 font-medium pb-2 border-b border-gray-100">...</div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Year Level</label>
+                                <div id="profile-year" class="text-gray-800 font-medium pb-2 border-b border-gray-100">...</div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">College / Department</label>
+                                <div id="profile-college" class="text-gray-800 font-medium pb-2 border-b border-gray-100">...</div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Contact Number</label>
+                                <div id="profile-contact" class="text-gray-800 font-medium pb-2 border-b border-gray-100">...</div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Email Address</label>
+                                <div id="profile-email" class="text-gray-800 font-medium pb-2 border-b border-gray-100">...</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -354,7 +390,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Setup Firebase
         const userFirebaseConfig = {
@@ -373,8 +409,8 @@
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'swiftclear-6195d';
 
-        // --- DYNAMIC USER DATA ---
-        let sessionUser = { username: 'wendel_f', name: 'Wendel N. Flores', details: 'BSIS 2-B' };
+        // Session
+        let sessionUser = { username: 'wendel_f', name: 'Wendel N. Flores', details: 'Student' };
         try {
             const saved = JSON.parse(localStorage.getItem('sc_user'));
             if(saved && saved.username) sessionUser = saved;
@@ -382,17 +418,14 @@
         
         const studentId = sessionUser.username;
         const studentName = sessionUser.name || studentId;
-        // Dynamically insert the details passed from the new registration form (e.g. BSIS 2-B)
-        const studentDetails = sessionUser.details || sessionUser.role || 'Student';
 
-        // Apply dynamic names to the UI
+        // Apply basic dynamic names immediately (Profile handles the rest)
         document.getElementById('nav-display-name').innerText = studentName;
         document.getElementById('nav-avatar').innerText = studentName.charAt(0).toUpperCase();
         document.getElementById('welcome-name').innerText = studentName;
         document.getElementById('badge-student-id').innerText = `ID: ${studentId}`;
-        document.getElementById('badge-student-role').innerText = studentDetails;
 
-        // UI & Tab Helpers attached to window
+        // UI & Tab Helpers
         window.switchTab = (tabId) => {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(`view-${tabId}`).classList.remove('hidden');
@@ -401,8 +434,10 @@
             const activeNav = document.getElementById(`nav-${tabId}`);
             if(activeNav) activeNav.className = 'sidebar-link w-full flex items-center gap-3 px-4 py-3 bg-chmsu-green text-white rounded-xl font-medium shadow-md transition-colors text-left';
 
-            const titles = { 'dashboard': 'Student Portal', 'clearances': 'My Clearances', 'notifications': 'Notifications', 'history': 'Activity History', 'settings': 'Account Settings' };
+            const titles = { 'dashboard': 'Student Portal', 'clearances': 'My Clearances', 'notifications': 'Notifications', 'history': 'Activity History', 'settings': 'Student Profile' };
             document.getElementById('header-title').innerText = titles[tabId];
+
+            if(window.innerWidth < 1024) window.toggleSidebar();
         };
 
         window.toggleSidebar = () => {
@@ -416,7 +451,7 @@
         };
         window.onclick = (e) => { if (!e.target.closest('.group')) document.getElementById('profile-menu').classList.add('hidden'); };
 
-        window.openModal = (remarkText = "A clearing officer has flagged your account. Please visit the respective department to resolve this issue to proceed with your clearance.") => {
+        window.openModal = (remarkText = "A clearing officer has flagged your account.") => {
             document.getElementById('modal-instructions-text').innerText = remarkText;
             const m = document.getElementById('action-modal');
             const mc = document.getElementById('modal-content');
@@ -443,12 +478,172 @@
 
         window.generateCertificate = () => {
             window.showToast("Downloading Official E-Clearance Certificate...", "success");
-            setTimeout(() => {
-                window.showToast("Certificate downloaded successfully!", "success");
-            }, 2000);
+            setTimeout(() => { window.showToast("Certificate downloaded successfully!", "success"); }, 2000);
         };
 
-        // Firebase Auth & Listeners
+        // --- Data Helpers ---
+        let globalUserData = null;
+        let globalClearanceData = null;
+
+        function getFullCourseName(acronym) {
+            const map = {
+                "BAEL": "Bachelor of Arts in English Language", "BASS": "Bachelor of Arts in Social Science",
+                "BPA": "Bachelor of Public Administration", "BSAM": "Bachelor of Science in Applied Mathematics",
+                "BSP": "Bachelor of Science in Psychology", "BSHM": "Bachelor of Science in Hospitality Management",
+                "BSOA": "Bachelor of Science in Office Administration", "BSIS": "Bachelor of Science in Information Systems",
+                "BECEd": "Bachelor of Early Childhood Education", "BEEd": "Bachelor of Elementary Education",
+                "BPEd": "Bachelor of Physical Education", "BSEd-English": "BSEd - Major in English",
+                "BSEd-Filipino": "BSEd - Major in Filipino", "BSEd-Math": "BSEd - Major in Mathematics",
+                "BSEd-Science": "BSEd - Major in Science", "BSNEd": "Bachelor of Special Needs Education",
+                "BTLEd-HE": "BTLEd - Home Economics", "BTLEd-IA": "BTLEd - Industrial Arts",
+                "BSCE": "Bachelor of Science in Civil Engineering", "BIT-ArchDrafting": "BIT - Architectural Drafting",
+                "BIT-Automotive": "BIT - Automotive Technology", "BIT-Electrical": "BIT - Electrical Technology",
+                "BIT-Electronics": "BIT - Electronics Technology", "BIT-Apparel": "BIT - Apparel & Fashion Tech",
+                "BIT-Culinary": "BIT - Culinary Technology", "BIT-Mechanical": "BIT - Mechanical Technology",
+                "BIT-HVACR": "BIT - HVACR"
+            };
+            return map[acronym] || acronym;
+        }
+
+        function getCollegeName(courseCode) {
+            const code = courseCode || "";
+            if(["BSIS","BSIT","BSCS"].includes(code)) return "College of Information and Communications Technology";
+            if(["BSCE","BIT-ArchDrafting","BIT-Automotive","BIT-Electrical","BIT-Electronics","BIT-Apparel","BIT-Culinary","BIT-Mechanical","BIT-HVACR"].includes(code)) return "College of Engineering and Industrial Technology";
+            if(["BECEd","BEEd","BPEd","BSNEd","BSEd-English","BSEd-Filipino","BSEd-Math","BSEd-Science","BTLEd-HE","BTLEd-IA"].includes(code)) return "College of Education";
+            if(["BSHM","BSOA"].includes(code)) return "College of Business and Management";
+            if(["BAEL","BASS","BPA","BSAM","BSP"].includes(code)) return "College of Arts and Sciences";
+            return "Carlos Hilado Memorial State University";
+        }
+
+        function renderProfile(uData) {
+            if (!uData) return;
+            const course = uData.course || "";
+            const accurateDetails = uData.details || (course ? `${course} ${uData.yearLevel}-${uData.section}` : "Student");
+
+            document.getElementById('profile-name').innerText = uData.name || studentName;
+            document.getElementById('profile-avatar').innerText = (uData.name || studentName).charAt(0).toUpperCase();
+            document.getElementById('profile-id').innerText = studentId;
+            document.getElementById('profile-course').innerText = getFullCourseName(course) || "N/A";
+            document.getElementById('profile-year').innerText = uData.yearLevel ? `Year ${uData.yearLevel} - Section ${uData.section}` : "N/A";
+            document.getElementById('profile-college').innerText = getCollegeName(course);
+            document.getElementById('profile-contact').innerText = uData.contact || "N/A";
+            document.getElementById('profile-email').innerText = uData.email || "N/A";
+            
+            // Fix Top Badge dynamically!
+            document.getElementById('badge-student-role').innerText = accurateDetails;
+        }
+
+        function renderHistory() {
+            let html = '';
+            
+            // 1. Account Created
+            if (globalUserData && globalUserData.createdAt) {
+                const dateCreated = new Date(globalUserData.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                html += `
+                    <div class="relative pl-8 pb-8">
+                        <div class="absolute -left-2.5 top-1 w-5 h-5 bg-gray-300 rounded-full border-4 border-white shadow-sm z-10"></div>
+                        <div class="absolute left-0 top-3 bottom-0 w-0.5 bg-gray-200"></div>
+                        <h3 class="font-bold text-gray-800">Account Created</h3>
+                        <p class="text-sm text-gray-500">${dateCreated}</p>
+                        <p class="text-xs text-gray-400 mt-1">Welcome to SwiftClear, ${globalUserData.name}!</p>
+                    </div>
+                `;
+            }
+
+            // 2. Clearance Initiated
+            if (globalClearanceData && globalClearanceData.timestamp) {
+                const initDate = new Date(globalClearanceData.timestamp).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                html += `
+                    <div class="relative pl-8 pb-8">
+                        <div class="absolute -left-2.5 top-1 w-5 h-5 bg-blue-500 rounded-full border-4 border-white shadow-sm z-10"></div>
+                        <div class="absolute left-0 top-3 bottom-0 w-0.5 bg-gray-200"></div>
+                        <h3 class="font-bold text-gray-800">Clearance Initiated</h3>
+                        <p class="text-sm text-gray-500">${initDate}</p>
+                        <p class="text-xs text-gray-400 mt-1">Clearance process requested for current semester.</p>
+                    </div>
+                `;
+            }
+
+            // 3. Approvals 
+            if (globalClearanceData) {
+                let cleared = 0;
+                if(globalClearanceData.library === 'Approved') cleared++;
+                if(globalClearanceData.business === 'Approved' || globalClearanceData.finance === 'Approved') cleared++;
+                if(globalClearanceData.registrar === 'Approved') cleared++;
+                if(globalClearanceData.dean === 'Approved') cleared++;
+
+                if (cleared > 0) {
+                    html += `
+                        <div class="relative pl-8">
+                            <div class="absolute -left-2.5 top-1 w-5 h-5 ${cleared === 4 ? 'bg-chmsu-gold' : 'bg-chmsu-green'} rounded-full border-4 border-white shadow-sm z-10"></div>
+                            <h3 class="font-bold text-gray-800">Department Approvals</h3>
+                            <p class="text-sm text-gray-500">Recent Activity</p>
+                            <p class="text-xs text-gray-400 mt-1">You have been cleared by ${cleared} out of 4 departments.</p>
+                        </div>
+                    `;
+                }
+            } else if (!globalClearanceData && !globalUserData) {
+                html = `<p class="text-gray-500 text-center py-4">No history available yet.</p>`;
+            }
+
+            document.getElementById('history-timeline').innerHTML = html;
+        }
+
+        function renderNotifications(data) {
+            if (!data) return;
+            let html = '';
+            let hasNotifs = false;
+            
+            const depts = [
+                { id: 'library', name: 'Library Services', status: data.library, remark: data.libraryRemark },
+                { id: 'business', name: 'Business Affairs', status: data.business || data.finance, remark: data.businessRemark },
+                { id: 'registrar', name: 'Registrar', status: data.registrar, remark: data.registrarRemark },
+                { id: 'dean', name: 'College Dean', status: data.dean, remark: data.deanRemark }
+            ];
+
+            depts.forEach(d => {
+                if(d.status === 'Approved') {
+                    hasNotifs = true;
+                    html += `
+                        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-start gap-4 animate-fade-in mb-3">
+                            <div class="bg-green-100 text-green-600 p-3 rounded-full"><i class="fa-solid fa-check-double"></i></div>
+                            <div>
+                                <h4 class="font-bold text-gray-800">${d.name} Approved</h4>
+                                <p class="text-sm text-gray-600">Your clearance has been successfully verified and signed by ${d.name}.</p>
+                                <p class="text-xs text-gray-400 mt-2"><i class="fa-regular fa-clock"></i> Recently Updated</p>
+                            </div>
+                        </div>
+                    `;
+                } else if (d.status === 'Hold' || d.status === 'Action Needed') {
+                    hasNotifs = true;
+                    html += `
+                        <div class="bg-white p-5 rounded-2xl border border-red-200 shadow-sm flex items-start gap-4 animate-fade-in mb-3">
+                            <div class="bg-red-100 text-red-600 p-3 rounded-full"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                            <div class="w-full">
+                                <h4 class="font-bold text-gray-800">Action Required: ${d.name}</h4>
+                                <p class="text-sm text-gray-600">A clearing officer flagged your account.</p>
+                                <div class="mt-2 bg-red-50 p-3 rounded-lg text-sm text-red-700 border border-red-100">
+                                    <strong>Remark:</strong> ${d.remark || 'Please visit the department to resolve.'}
+                                </div>
+                                <p class="text-xs text-gray-400 mt-2"><i class="fa-regular fa-clock"></i> Recently Updated</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            if(!hasNotifs) {
+                html = `
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center text-gray-500">
+                        <i class="fa-regular fa-bell text-4xl mb-3 text-gray-300"></i>
+                        <p>No new notifications at this time.</p>
+                    </div>
+                `;
+            }
+            document.getElementById('notifications-list').innerHTML = html;
+        }
+
+        // Firebase Setup & Listeners
         const initAuth = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -460,39 +655,49 @@
         };
         initAuth();
 
-        onAuthStateChanged(auth, (firebaseUser) => {
+        onAuthStateChanged(auth, async (firebaseUser) => {
             if (!firebaseUser) return;
 
+            // Fetch Real User Details to populate Settings Profile
+            try {
+                const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', studentId);
+                const userSnap = await getDoc(userDocRef);
+                if (userSnap.exists()) {
+                    globalUserData = userSnap.data();
+                    renderProfile(globalUserData);
+                    renderHistory();
+                }
+            } catch (e) { console.error("Error fetching user:", e); }
+
+            // Listen for Clearances
             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'clearances', studentId);
-            
             onSnapshot(docRef, (docSnap) => {
                 const initContainer = document.getElementById('initiate-btn-container');
                 const progressContainer = document.getElementById('progress-container');
                 
                 if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    
-                    // Show Progress UI, Hide Initiate Button
+                    globalClearanceData = docSnap.data();
+                    renderNotifications(globalClearanceData);
+                    renderHistory();
+
                     document.getElementById('banner-status').innerHTML = 'Clearance Status: <span class="text-chmsu-gold">In Progress</span>';
                     if (initContainer) initContainer.classList.add('hidden');
                     if (progressContainer) progressContainer.classList.remove('hidden');
 
-                    // Update 4 Department Cards
-                    updateCardUI('library', data.library || 'Pending', data.libraryRemark);
-                    updateCardUI('business', data.business || data.finance || 'Pending', data.businessRemark); 
-                    updateCardUI('registrar', data.registrar || 'Pending', data.registrarRemark);
-                    updateCardUI('dean', data.dean || 'Pending', data.deanRemark);
+                    updateCardUI('library', globalClearanceData.library || 'Pending', globalClearanceData.libraryRemark);
+                    updateCardUI('business', globalClearanceData.business || globalClearanceData.finance || 'Pending', globalClearanceData.businessRemark); 
+                    updateCardUI('registrar', globalClearanceData.registrar || 'Pending', globalClearanceData.registrarRemark);
+                    updateCardUI('dean', globalClearanceData.dean || 'Pending', globalClearanceData.deanRemark);
 
                     // Calculate Completion
                     let clearedCount = 0;
-                    if (data.library === 'Approved') clearedCount++;
-                    if (data.business === 'Approved' || data.finance === 'Approved') clearedCount++;
-                    if (data.registrar === 'Approved') clearedCount++;
-                    if (data.dean === 'Approved') clearedCount++;
+                    if (globalClearanceData.library === 'Approved') clearedCount++;
+                    if (globalClearanceData.business === 'Approved' || globalClearanceData.finance === 'Approved') clearedCount++;
+                    if (globalClearanceData.registrar === 'Approved') clearedCount++;
+                    if (globalClearanceData.dean === 'Approved') clearedCount++;
 
                     const progressPct = Math.round((clearedCount / 4) * 100);
                     
-                    // FIX: Connect directly to the proper horizontal progress bar IDs
                     const progressText = document.getElementById('overall-progress-text');
                     const progressBar = document.getElementById('overall-progress-bar');
                     const countText = document.getElementById('cleared-count-text');
@@ -501,7 +706,6 @@
                     if (progressBar) progressBar.style.width = progressPct + '%';
                     if (countText) countText.innerText = `${clearedCount} of 4 departments cleared`;
 
-                    // Update PDF generation button if 100%
                     const certBtn = document.getElementById('generate-pdf-btn');
                     if(progressPct === 100) {
                         document.getElementById('banner-status').innerHTML = 'Clearance Status: <span class="text-white font-black">Fully Cleared</span>';
@@ -512,9 +716,7 @@
                             certBtn.setAttribute("onclick", "generateCertificate()");
                         }
                         const certIcon = document.getElementById('cert-icon');
-                        if (certIcon) {
-                            certIcon.classList.add('bg-chmsu-gold/20', 'text-chmsu-gold', 'bg-yellow-100');
-                        }
+                        if (certIcon) certIcon.classList.add('bg-chmsu-gold/20', 'text-chmsu-gold', 'bg-yellow-100');
                     } else {
                         if (certBtn) {
                             certBtn.disabled = true;
@@ -523,13 +725,14 @@
                             certBtn.removeAttribute("onclick");
                         }
                         const certIcon = document.getElementById('cert-icon');
-                        if (certIcon) {
-                            certIcon.classList.remove('bg-chmsu-gold/20', 'text-chmsu-gold', 'bg-yellow-100');
-                        }
+                        if (certIcon) certIcon.classList.remove('bg-chmsu-gold/20', 'text-chmsu-gold', 'bg-yellow-100');
                     }
 
                 } else {
-                    // Not initiated state
+                    globalClearanceData = null;
+                    renderNotifications(null);
+                    renderHistory();
+
                     document.getElementById('banner-status').innerHTML = 'Clearance Status: <span class="text-gray-300">Not Initiated</span>';
                     if (initContainer) initContainer.classList.remove('hidden');
                     if (progressContainer) progressContainer.classList.add('hidden');
@@ -549,7 +752,6 @@
 
             if(!card) return;
 
-            // Reset Card Base
             card.className = "bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all p-5 relative overflow-hidden";
             
             if (status === 'Pending') {
@@ -580,17 +782,13 @@
                 desc.innerText = "Deficiency recorded. Needs your attention.";
                 desc.className = "text-xs text-red-600 font-bold mb-4 h-8";
                 
-                // Safe passing of the remark text to the modal
                 const safeRemark = remarkText ? remarkText.replace(/'/g, "\\'") : "Please visit the respective department to resolve your issue.";
                 action.innerHTML = `<button onclick="openModal('${safeRemark}')" class="w-full py-2 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold rounded-lg transition-colors border border-red-200">View Details</button>`;
             }
         }
 
         window.initiateClearance = async () => {
-            // Ensure auth is initialized before writing
-            if (!auth.currentUser) {
-                await signInAnonymously(auth);
-            }
+            if (!auth.currentUser) await signInAnonymously(auth);
 
             const btn = document.getElementById('init-btn');
             if(btn) {
@@ -600,7 +798,6 @@
             
             try {
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'clearances', studentId);
-                // Create the record in Firestore
                 await setDoc(docRef, {
                     username: studentId,
                     name: studentName,
