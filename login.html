@@ -193,6 +193,7 @@
                                 <optgroup label="Business & Management">
                                     <option value="BSHM">Bachelor of Science in Hospitality Management</option>
                                     <option value="BSOA">Bachelor of Science in Office Administration</option>
+                                    <option value="BSIS">Bachelor of Science in Information Systems</option>
                                 </optgroup>
                                 <optgroup label="Education">
                                     <option value="BECEd">Bachelor of Early Childhood Education</option>
@@ -211,7 +212,6 @@
                                     <option value="BTLEd-IA">BTLEd - Industrial Arts</option>
                                 </optgroup>
                                 <optgroup label="Engineering & Technology">
-                                    <option value="BSIS">Bachelor of Science in Information Systems</option>
                                     <option value="BSCE">Bachelor of Science in Civil Engineering</option>
                                     <option value="BIT-ArchDrafting">BIT - Architectural Drafting</option>
                                     <option value="BIT-Automotive">BIT - Automotive Technology</option>
@@ -288,13 +288,13 @@
                         <div class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
                             <i class="fa-solid fa-key text-2xl text-chmsu-green"></i>
                         </div>
-                        <h2 class="text-2xl font-bold text-gray-800">Reset Password</h2>
-                        <p class="text-sm text-gray-500 mt-2">Enter your registered email address and we'll send you instructions to reset your password.</p>
+                        <h2 class="text-2xl font-bold text-gray-800">Account Recovery</h2>
+                        <p class="text-sm text-gray-500 mt-2">Enter your registered email address. Since this is a demo environment, your password will be retrieved immediately.</p>
                     </div>
 
                     <form onsubmit="handleForgotPassword(event)" class="space-y-5">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Registered Email Address</label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <i class="fa-regular fa-envelope text-gray-400"></i>
@@ -303,8 +303,8 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="w-full bg-chmsu-green hover:bg-[#084223] text-white font-bold py-3 rounded-xl transition-all shadow-lg">
-                            Send Reset Link
+                        <button id="forgot-btn" type="submit" class="w-full bg-chmsu-green hover:bg-[#084223] text-white font-bold py-3 rounded-xl transition-all transform hover:-translate-y-0.5 shadow-lg shadow-green-900/20">
+                            Recover Password
                         </button>
                     </form>
                 </div>
@@ -317,7 +317,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // ADDED getDocs & collection to allow searching through accounts for password recovery
+        import { getFirestore, doc, setDoc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Setup Firebase
         const userFirebaseConfig = {
@@ -410,6 +411,7 @@
 
                 // Save merged details to LIVE FIREBASE DATABASE
                 await setDoc(docRef, {
+                    username: studentId, // Saved explicitly for recovery lookups
                     password: password, 
                     role: 'Student',
                     name: fullName,
@@ -421,7 +423,7 @@
                     course: course,
                     yearLevel: year,
                     section: section,
-                    details: courseDetails, // We use this in the dashboard badge!
+                    details: courseDetails, 
                     redirect: 'student_dashboard.html',
                     createdAt: Date.now()
                 });
@@ -484,7 +486,6 @@
                 if (docSnap.exists()) {
                     const userData = docSnap.data();
                     if (userData.password === password) {
-                        // Include the 'details' tag which holds the "BSIS 2-B" string
                         localStorage.setItem('sc_user', JSON.stringify({ 
                             username: username, 
                             name: userData.name, 
@@ -511,13 +512,51 @@
             }
         };
 
-        window.handleForgotPassword = (e) => {
+        // NEW: Database Password Recovery Simulation
+        window.handleForgotPassword = async (e) => {
             e.preventDefault();
-            window.showToast("Reset link sent to your email address.", "success");
-            setTimeout(() => {
-                window.toggleForms('login');
-                e.target.reset();
-            }, 2000);
+            const emailInput = document.getElementById('forgot-email').value.trim().toLowerCase();
+            const btn = document.getElementById('forgot-btn');
+
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Searching Database...';
+            btn.disabled = true;
+
+            try {
+                if (!auth.currentUser) await signInAnonymously(auth);
+
+                // Fetch all users to find the matching email
+                const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
+                const snapshot = await getDocs(usersRef);
+                
+                let foundUser = null;
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (data.email && data.email.toLowerCase() === emailInput) {
+                        foundUser = data;
+                    }
+                });
+
+                if (foundUser) {
+                    // Tell the user their password in a toast instead of an email
+                    window.showToast(`Demo Recovery: Your password is "${foundUser.password}"`, "info");
+                    
+                    setTimeout(() => {
+                        window.toggleForms('login');
+                        // Auto-fill their ID to help them log in
+                        document.getElementById('login-username').value = foundUser.username || ''; 
+                        e.target.reset();
+                    }, 4000); // Wait 4 seconds so they can read the password
+                } else {
+                    window.showToast("No account found with that email address.", "error");
+                }
+
+            } catch (error) {
+                console.error("Recovery Error:", error);
+                window.showToast("Error connecting to database.", "error");
+            } finally {
+                btn.innerHTML = 'Recover Password';
+                btn.disabled = false;
+            }
         };
 
         // --- Standard UI Functions ---
@@ -560,18 +599,25 @@
         window.showToast = (message, type = 'success') => {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            const bgColor = type === 'success' ? 'bg-emerald-500' : 'bg-red-500';
-            const icon = type === 'success' ? 'fa-check-circle' : 'fa-circle-exclamation';
+            
+            // Allow an "info" type for the password recovery notification
+            let bgColor = 'bg-emerald-500';
+            let icon = 'fa-check-circle';
+            if (type === 'error') { bgColor = 'bg-red-500'; icon = 'fa-circle-exclamation'; }
+            if (type === 'info') { bgColor = 'bg-blue-600'; icon = 'fa-circle-info'; }
 
             toast.className = `${bgColor} text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-y-[-20px] opacity-0`;
             toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span class="font-medium text-sm">${message}</span>`;
             
             container.appendChild(toast);
             setTimeout(() => toast.classList.remove('opacity-0', 'translate-y-[-20px]'), 10);
+            
+            // Info toasts stay on screen a little longer so they can read the password
+            const displayTime = type === 'info' ? 5000 : 3000;
             setTimeout(() => {
                 toast.classList.add('opacity-0');
                 setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            }, displayTime);
         };
     </script>
 </body>
