@@ -20,6 +20,7 @@
         .tab-content { display: none; }
         .tab-content.block { display: block; animation: slideIn 0.3s ease-out forwards; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: slideIn 0.3s ease-out forwards; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
@@ -171,10 +172,18 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, doc, updateDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "AIzaSyB5kxApyrtCUXLMiTO4g-kNXZgpWkf1jlg", authDomain: "swiftclear-6195d.firebaseapp.com", projectId: "swiftclear-6195d" };
+        const userFirebaseConfig = {
+            apiKey: "AIzaSyB5kxApyrtCUXLMiTO4g-kNXZgpWkf1jlg",
+            authDomain: "swiftclear-6195d.firebaseapp.com",
+            projectId: "swiftclear-6195d",
+            storageBucket: "swiftclear-6195d.firebasestorage.app",
+            messagingSenderId: "386476383105",
+            appId: "1:386476383105:web:2d706ae20c19b2a633e680"
+        };
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : userFirebaseConfig;
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -206,7 +215,7 @@
         const initAuth = async () => { try { if (!auth.currentUser) await signInAnonymously(auth); } catch (err) {} };
         initAuth();
 
-        onAuthStateChanged(auth, async (user) => {
+        onAuthStateChanged(auth, (user) => {
             if (!user) return;
             const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'clearances');
             
@@ -245,8 +254,8 @@
             const courseQ = document.getElementById('course-filter').value;
             
             let filtered = globalRequestsData.filter(d => {
-                const matchSearch = d.username.toLowerCase().includes(searchQ) || (d.name||'').toLowerCase().includes(searchQ);
-                const matchCourse = courseQ === 'All' || (d.course||'').includes(courseQ) || (d.details||'').includes(courseQ);
+                const matchSearch = (d.username||'').toLowerCase().includes(searchQ) || (d.name||'').toLowerCase().includes(searchQ);
+                const matchCourse = courseQ === 'All' || (d.details||'').includes(courseQ);
                 return matchSearch && matchCourse;
             });
 
@@ -260,7 +269,7 @@
                 if (status === 'Pending') {
                     html = `<p class="text-sm font-medium text-gray-600">Pending Grades</p>`;
                     badge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">Pending</span>`;
-                    actions = `<button onclick="window.approve('${data.username}')" class="p-2 bg-emerald-50 text-emerald-600 rounded-lg mx-1"><i class="fa-solid fa-check"></i></button><button onclick="window.openDeficiencyModal('${data.username}')" class="p-2 bg-orange-50 text-orange-600 rounded-lg mx-1"><i class="fa-solid fa-flag"></i></button>`;
+                    actions = `<button onclick="window.approve('${data.username}')" class="p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-lg mx-1"><i class="fa-solid fa-check"></i></button><button onclick="window.openDeficiencyModal('${data.username}')" class="p-2 bg-orange-50 text-orange-600 hover:bg-orange-500 hover:text-white rounded-lg mx-1"><i class="fa-solid fa-flag"></i></button>`;
                 } else if (status === 'Approved') {
                     html = `<p class="text-sm text-emerald-600 font-medium">Academically Clear</p>`;
                     badge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">Cleared</span>`;
@@ -268,11 +277,11 @@
                 } else {
                     html = `<p class="text-sm font-medium text-orange-600">Hold</p><p class="text-xs text-orange-700">${data.deanRemark||'Academic Issue'}</p>`;
                     badge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700">Hold</span>`;
-                    actions = `<button onclick="window.approve('${data.username}')" class="p-2 bg-emerald-50 text-emerald-600 rounded-lg mx-1"><i class="fa-solid fa-check"></i></button>`;
+                    actions = `<button onclick="window.approve('${data.username}')" class="p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-lg mx-1"><i class="fa-solid fa-check"></i></button>`;
                 }
 
                 tbody.innerHTML += `
-                    <tr class="hover:bg-gray-50">
+                    <tr class="hover:bg-gray-50 animate-fade-in">
                         <td class="p-4 font-medium">${data.username}</td>
                         <td class="p-4"><p class="font-bold">${data.name||data.username}</p><p class="text-xs text-gray-400">${data.details||''}</p></td>
                         <td class="p-4">${html}</td>
@@ -283,12 +292,12 @@
             });
         }
 
-        // New function specifically for filtering 4th Years
         function renderGraduatingTable() {
             const tbody = document.getElementById('graduating-table-body');
+            if(!tbody) return;
             
-            // Strictly filter for Year Level = "4"
-            let graduatingStudents = globalRequestsData.filter(d => d.yearLevel === "4");
+            // Filter for Year Level = "4" OR " 4-" inside details
+            let graduatingStudents = globalRequestsData.filter(d => d.yearLevel === "4" || String(d.details||'').includes(" 4-"));
 
             tbody.innerHTML = "";
             if (graduatingStudents.length === 0) { 
@@ -304,7 +313,7 @@
                 else badge = `<span class="text-orange-600"><i class="fa-solid fa-circle-xmark"></i> Flagged</span>`;
 
                 tbody.innerHTML += `
-                    <tr class="hover:bg-gray-50">
+                    <tr class="hover:bg-gray-50 animate-fade-in">
                         <td class="p-4 font-medium text-gray-800">${data.username}</td>
                         <td class="p-4 font-bold text-gray-900">${data.name || data.username}</td>
                         <td class="p-4 text-gray-600">${data.details || 'N/A'}</td>
