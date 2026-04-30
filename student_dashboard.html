@@ -944,11 +944,17 @@
                 btn.disabled = true;
             }
             
+            // Extract year level from details (e.g. "BSIS 4-A" -> "4")
+            const yearMatch = studentDetails.match(/\s(\d)-/);
+            const yearLvl = yearMatch ? yearMatch[1] : '';
+
             try {
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'clearances', studentId);
                 await setDoc(docRef, {
                     username: studentId,
                     name: studentName,
+                    details: studentDetails,
+                    yearLevel: yearLvl,
                     library: 'Pending',
                     business: 'Pending',
                     registrar: 'Pending',
