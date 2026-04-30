@@ -20,6 +20,7 @@
         .tab-content { display: none; }
         .tab-content.block { display: block; animation: slideIn 0.3s ease-out forwards; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: slideIn 0.3s ease-out forwards; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
@@ -112,12 +113,10 @@
                             <h2 class="text-lg font-bold text-gray-800">Clearance Queue</h2>
                         </div>
                         <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-                            <!-- COURSE FILTER -->
                             <select id="course-filter" class="px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none">
                                 <option value="All">All Courses</option>
                                 <option value="BSIS">BSIS</option><option value="BSIT">BSIT</option><option value="BSCE">BSCE</option><option value="BSEd">BSEd</option><option value="BSHM">BSHM</option>
                             </select>
-                            <!-- SEARCH BAR -->
                             <div class="relative w-full sm:w-64">
                                 <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                                 <input type="text" id="search-input" placeholder="Search ID or Name..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm outline-none">
@@ -148,10 +147,18 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, doc, updateDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "AIzaSyB5kxApyrtCUXLMiTO4g-kNXZgpWkf1jlg", authDomain: "swiftclear-6195d.firebaseapp.com", projectId: "swiftclear-6195d" };
+        const userFirebaseConfig = {
+            apiKey: "AIzaSyB5kxApyrtCUXLMiTO4g-kNXZgpWkf1jlg",
+            authDomain: "swiftclear-6195d.firebaseapp.com",
+            projectId: "swiftclear-6195d",
+            storageBucket: "swiftclear-6195d.firebasestorage.app",
+            messagingSenderId: "386476383105",
+            appId: "1:386476383105:web:2d706ae20c19b2a633e680"
+        };
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : userFirebaseConfig;
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -183,7 +190,7 @@
         const initAuth = async () => { try { if (!auth.currentUser) await signInAnonymously(auth); } catch (err) {} };
         initAuth();
 
-        onAuthStateChanged(auth, async (user) => {
+        onAuthStateChanged(auth, (user) => {
             if (!user) return;
             const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'clearances');
             
@@ -221,8 +228,8 @@
             const courseQ = document.getElementById('course-filter').value;
             
             let filtered = globalRequestsData.filter(d => {
-                const matchSearch = d.username.toLowerCase().includes(searchQ) || (d.name||'').toLowerCase().includes(searchQ);
-                const matchCourse = courseQ === 'All' || (d.course||'').includes(courseQ) || (d.details||'').includes(courseQ);
+                const matchSearch = (d.username||'').toLowerCase().includes(searchQ) || (d.name||'').toLowerCase().includes(searchQ);
+                const matchCourse = courseQ === 'All' || (d.details||'').includes(courseQ);
                 return matchSearch && matchCourse;
             });
 
@@ -248,7 +255,7 @@
                 }
 
                 tbody.innerHTML += `
-                    <tr class="hover:bg-gray-50">
+                    <tr class="hover:bg-gray-50 animate-fade-in">
                         <td class="p-4 font-medium">${data.username}</td>
                         <td class="p-4"><p class="font-bold">${data.name||data.username}</p><p class="text-xs text-gray-400">${data.details||''}</p></td>
                         <td class="p-4">${html}</td>
