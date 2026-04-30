@@ -187,24 +187,17 @@
             if (!user) return;
             const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'clearances');
             
-            onSnapshot(colRef, async (snapshot) => {
-                // Fetch users to grab Course and Year Level for Search/Filter
-                const usersSnap = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', 'users'));
-                const usersMap = {};
-                usersSnap.forEach(u => usersMap[u.id] = u.data());
-
+            onSnapshot(colRef, (snapshot) => {
                 let tot=0, pen=0, hol=0, cle=0;
                 globalRequestsData = [];
                 
                 snapshot.forEach(docSnap => {
                     let data = docSnap.data();
-                    let uData = usersMap[data.username] || {};
-                    data.course = uData.course || '';
-                    data.details = uData.details || '';
                     tot++;
                     
-                    if (data.library === 'Pending' || !data.library) pen++;
-                    else if (data.library === 'Approved') cle++;
+                    const status = data.library || 'Pending';
+                    if (status === 'Pending') pen++;
+                    else if (status === 'Approved') cle++;
                     else hol++;
                     
                     globalRequestsData.push(data);
@@ -216,6 +209,9 @@
                 document.getElementById('stat-cleared').innerText = cle;
 
                 renderTable();
+            }, (err) => {
+                console.error(err);
+                document.getElementById('student-table-body').innerHTML = `<tr><td colspan="5" class="p-4 text-red-500 text-center">Connection error. Check console.</td></tr>`;
             });
         });
 
