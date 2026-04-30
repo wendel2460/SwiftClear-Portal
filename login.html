@@ -35,20 +35,20 @@
         
         /* Custom Scrollbar for Form */
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4 sm:p-8">
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4 sm:p-8">
 
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
 
-    <!-- Main Container: Removed max-h to prevent text cutoff, increased rounded edges -->
-    <div class="max-w-5xl w-full bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[600px] my-4">
+    <!-- Main Container: Smoother edges (rounded-[2.5rem]) and natural height to prevent cutoff -->
+    <div class="max-w-5xl w-full bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row my-auto">
         
         <!-- Left Side: Branding / Info -->
-        <div class="md:w-5/12 bg-gradient-to-br from-chmsu-green to-[#084223] text-white p-10 flex flex-col justify-between relative overflow-hidden bg-pattern">
+        <div class="md:w-5/12 bg-gradient-to-br from-chmsu-green to-[#084223] text-white p-10 flex flex-col justify-between relative overflow-hidden bg-pattern min-h-[300px]">
             <div class="absolute -top-24 -left-24 w-64 h-64 bg-white opacity-5 rounded-full"></div>
             <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-chmsu-gold opacity-10 rounded-full"></div>
             
@@ -63,7 +63,7 @@
                     </div>
                 </div>
 
-                <div class="mt-12 space-y-6">
+                <div class="mt-8 space-y-6">
                     <h2 class="text-3xl font-bold leading-tight">Streamlined Student Clearance</h2>
                     <p class="text-green-100 text-sm leading-relaxed">
                         Experience a hassle-free, automated way to process your university clearances. Secure, fast, and entirely online.
@@ -83,16 +83,16 @@
         </div>
 
         <!-- Right Side: Forms -->
-        <div class="md:w-7/12 p-8 md:p-12 relative flex items-center justify-center bg-white">
+        <div class="md:w-7/12 p-8 md:p-12 relative flex items-center justify-center bg-white min-h-[600px]">
             
             <a href="https://wendel2460.github.io/SwiftClear-Docs/" target="_blank" class="absolute top-6 right-6 text-xs sm:text-sm text-gray-500 hover:text-chmsu-green font-medium flex items-center gap-2 transition-colors bg-gray-50 hover:bg-green-50 px-4 py-2 rounded-full border border-gray-200 shadow-sm z-20">
                 <i class="fa-solid fa-book-open"></i> <span class="hidden sm:inline">Documentation</span>
             </a>
 
-            <div class="w-full max-w-md relative flex flex-col h-full justify-center">
+            <div class="w-full max-w-md relative flex flex-col justify-center">
                 
                 <!-- ================= LOGIN FORM ================= -->
-                <div id="login-form" class="form-transition show-form py-4">
+                <div id="login-form" class="form-transition show-form w-full">
                     <div class="text-center mb-8">
                         <h2 class="text-3xl font-bold text-gray-800">Welcome Back</h2>
                         <p class="text-sm text-gray-500 mt-2">Sign in to access your clearance dashboard</p>
@@ -100,12 +100,12 @@
 
                     <form onsubmit="handleLogin(event)" class="space-y-5">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Student ID / Admin ID or Email</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Student ID / Office ID or Email</label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                     <i class="fa-regular fa-user text-gray-400"></i>
                                 </div>
-                                <input type="text" id="login-identifier" required class="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all" placeholder="e.g. 12345678 or student@chmsu.edu.ph">
+                                <input type="text" id="login-identifier" required class="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all" placeholder="e.g. 12345678, lib, or email">
                             </div>
                         </div>
 
@@ -119,7 +119,7 @@
                                     <i class="fa-solid fa-lock text-gray-400"></i>
                                 </div>
                                 <input type="password" id="login-password" required class="w-full pl-11 pr-10 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all" placeholder="••••••••">
-                                <button type="button" onclick="togglePassword('login-password', this)" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600">
+                                <button type="button" onclick="togglePassword('login-password', this)" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none">
                                     <i class="fa-regular fa-eye"></i>
                                 </button>
                             </div>
@@ -143,20 +143,20 @@
 
                     <p class="mt-8 text-center text-sm text-gray-600">
                         Don't have an account? 
-                        <button type="button" onclick="toggleForms('signup')" class="font-bold text-chmsu-green hover:underline">Register Here</button>
+                        <button type="button" onclick="toggleForms('signup')" class="font-bold text-chmsu-green hover:underline focus:outline-none">Register Here</button>
                     </p>
                 </div>
 
                 <!-- ================= SIGN UP FORM ================= -->
-                <div id="signup-form" class="form-transition hide-form flex flex-col h-full py-4">
+                <div id="signup-form" class="form-transition hide-form flex flex-col w-full absolute top-1/2 left-0 right-0 transform -translate-y-1/2">
                     <div class="text-center mb-6 flex-shrink-0">
                         <h2 class="text-3xl font-bold text-gray-800">Create Account</h2>
                         <p class="text-sm text-gray-500 mt-1">Register to start your clearance process</p>
                     </div>
 
                     <!-- Scrollable Form Area with softer custom scrollbar -->
-                    <div class="overflow-y-auto custom-scrollbar pr-3 -mr-3 flex-1">
-                        <form onsubmit="handleSignup(event)" class="space-y-4 pb-2">
+                    <div class="overflow-y-auto custom-scrollbar pr-2 max-h-[60vh]">
+                        <form onsubmit="handleSignup(event)" class="space-y-4 pb-2 px-1">
                             
                             <!-- Name Block -->
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -294,22 +294,22 @@
 
                     <p class="mt-4 flex-shrink-0 text-center text-sm text-gray-600">
                         Already have an account? 
-                        <button type="button" onclick="toggleForms('login')" class="font-bold text-chmsu-green hover:underline">Sign In</button>
+                        <button type="button" onclick="toggleForms('login')" class="font-bold text-chmsu-green hover:underline focus:outline-none">Sign In</button>
                     </p>
                 </div>
 
                 <!-- ================= FORGOT PASSWORD FORM ================= -->
-                <div id="forgot-form" class="form-transition hide-form py-4">
-                    <button type="button" onclick="toggleForms('login')" class="absolute -top-2 -left-2 text-gray-400 hover:text-chmsu-green transition-colors flex items-center gap-1 text-sm font-medium">
+                <div id="forgot-form" class="form-transition hide-form w-full absolute top-1/2 left-0 right-0 transform -translate-y-1/2">
+                    <button type="button" onclick="toggleForms('login')" class="absolute -top-12 left-0 text-gray-400 hover:text-chmsu-green transition-colors flex items-center gap-1 text-sm font-medium focus:outline-none">
                         <i class="fa-solid fa-arrow-left"></i> Back to login
                     </button>
                     
-                    <div class="text-center mb-8 mt-6">
+                    <div class="text-center mb-8 mt-2">
                         <div class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
                             <i class="fa-solid fa-key text-2xl text-chmsu-green"></i>
                         </div>
                         <h2 class="text-3xl font-bold text-gray-800">Account Recovery</h2>
-                        <p class="text-sm text-gray-500 mt-3">Enter your registered email address. We will send you an official secure link to reset your password.</p>
+                        <p class="text-sm text-gray-500 mt-3 px-4">Enter your registered email address to instantly recover your demo password.</p>
                     </div>
 
                     <form onsubmit="handleForgotPassword(event)" class="space-y-6">
@@ -324,7 +324,7 @@
                         </div>
 
                         <button id="forgot-btn" type="submit" class="w-full bg-chmsu-green hover:bg-[#084223] text-white font-bold py-3.5 rounded-2xl transition-all transform hover:-translate-y-0.5 shadow-lg shadow-green-900/20">
-                            Send Reset Link
+                            Find Password
                         </button>
                     </form>
                 </div>
@@ -336,7 +336,7 @@
     <!-- JavaScript Logic with Firebase Integration -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Setup Firebase
@@ -355,6 +355,15 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'swiftclear-6195d';
+
+        // --- HARDCODED ADMIN LOGINS (No email required for these 5 offices) ---
+        const ADMIN_ACCOUNTS = {
+            'reg': { role: 'Registrar', name: 'Registrar Admin', redirect: 'registrar_dashboard.html' },
+            'lib': { role: 'Library', name: 'Chief Librarian', redirect: 'library_dashboard.html' },
+            'bus': { role: 'Business Office', name: 'Accounting Officer', redirect: 'business_dashboard.html' },
+            'osas': { role: 'OSAS', name: 'OSAS Coordinator', redirect: 'osas_dashboard.html' },
+            'cict_dean': { role: 'College Dean', name: 'Dean of CICT', redirect: 'dean_dashboard.html' }
+        };
 
         // --- Core Authentication Functions attached to Window ---
 
@@ -376,6 +385,11 @@
 
             if (password !== confirm) {
                 window.showToast("Passwords do not match!", "error");
+                return;
+            }
+
+            if (ADMIN_ACCOUNTS[studentId]) {
+                window.showToast("This ID is reserved for system admins.", "error");
                 return;
             }
 
@@ -401,13 +415,11 @@
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
 
-                // Send Official Email Verification Link
-                await sendEmailVerification(user);
-
-                // Save details to LIVE FIREBASE DATABASE using UID to prevent duplicates, but storing StudentID inside
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid), {
+                // Save details to LIVE FIREBASE DATABASE
+                const userData = {
                     username: studentId,
                     email: email,
+                    password: password, // Saved strictly for the Demo Recovery feature
                     role: 'Student',
                     name: fullName,
                     firstName: fName,
@@ -420,14 +432,24 @@
                     details: courseDetails, 
                     redirect: 'student_dashboard.html',
                     createdAt: Date.now()
-                });
+                };
 
-                // Force sign out so they can't log in without verifying
-                await signOut(auth);
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid), userData);
+                
+                // Also save by studentId to allow easy ID lookups later
+                await setDoc(docRef, userData);
 
-                window.showToast("Account created! We sent a verification link to your email. Please check your inbox.", "success");
-                e.target.reset();
-                setTimeout(() => window.toggleForms('login'), 4000);
+                // FIX: Immediately log them in! No email verification required.
+                localStorage.setItem('sc_user', JSON.stringify({ 
+                    username: studentId, 
+                    name: fullName, 
+                    role: 'Student',
+                    details: courseDetails
+                }));
+
+                window.showToast("Account created successfully! Redirecting...", "success");
+                setTimeout(() => window.location.href = 'student_dashboard.html', 1500);
+
             } catch (error) {
                 console.error(error);
                 if (error.code === 'auth/email-already-in-use') {
@@ -437,7 +459,6 @@
                 } else {
                     window.showToast("Registration Error. Please try again later.", "error");
                 }
-            } finally {
                 btn.innerHTML = 'Create Account';
                 btn.disabled = false;
             }
@@ -452,34 +473,43 @@
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
             btn.disabled = true;
 
+            // 1. ADMIN BYPASS: Instantly login offices without needing an email address
+            if (ADMIN_ACCOUNTS[identifier] && password === 'pass123') {
+                const adminData = ADMIN_ACCOUNTS[identifier];
+                localStorage.setItem('sc_user', JSON.stringify({ 
+                    username: identifier, 
+                    name: adminData.name, 
+                    role: adminData.role,
+                    details: adminData.role
+                }));
+                window.showToast(`Welcome, ${adminData.name}!`, 'success');
+                setTimeout(() => window.location.href = adminData.redirect, 1000);
+                return;
+            } else if (ADMIN_ACCOUNTS[identifier]) {
+                window.showToast("Invalid admin password.", "error");
+                btn.innerHTML = 'Sign In'; btn.disabled = false;
+                return;
+            }
+
+            // 2. REGULAR STUDENT LOGIN
             try {
                 let emailToLogin = identifier;
-                let foundUsername = identifier;
 
-                // If user entered an ID (no @ symbol), look up their email in Firestore
+                // If user entered a Student ID (no @ symbol), look up their email in Firestore
                 if (!identifier.includes('@')) {
-                    const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
-                    const q = query(usersRef, where('username', '==', identifier));
-                    const querySnapshot = await getDocs(q);
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', identifier);
+                    const docSnap = await getDoc(docRef);
                     
-                    if (querySnapshot.empty) {
-                        window.showToast("Student ID / Admin ID not found.", "error");
+                    if (!docSnap.exists()) {
+                        window.showToast("Student ID not found. Please register.", "error");
                         btn.innerHTML = 'Sign In'; btn.disabled = false; return;
                     }
-                    // Extract email from the found document
-                    emailToLogin = querySnapshot.docs[0].data().email;
+                    emailToLogin = docSnap.data().email;
                 }
 
                 // Secure Firebase Login
                 const userCredential = await signInWithEmailAndPassword(auth, emailToLogin, password);
                 const user = userCredential.user;
-
-                // ENFORCE EMAIL VERIFICATION
-                if (!user.emailVerified) {
-                    await signOut(auth);
-                    window.showToast("Please verify your email address. Check your inbox for the link.", "error");
-                    btn.innerHTML = 'Sign In'; btn.disabled = false; return;
-                }
 
                 // Fetch full data to route them properly
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid);
@@ -541,34 +571,60 @@
                         redirect: 'student_dashboard.html',
                         createdAt: Date.now()
                     });
+                    
+                    // Also save to standard lookup doc
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', newId), {
+                        username: newId, email: user.email, role: 'Student', name: user.displayName, details: 'BSIS 1-A (Google)'
+                    });
+
                     localStorage.setItem('sc_user', JSON.stringify({ username: newId, name: user.displayName, role: 'Student', details: 'BSIS 1-A' }));
                     window.showToast("Google account linked successfully!", "success");
                     setTimeout(() => { window.location.href = 'student_dashboard.html'; }, 1000);
                 }
-            } catch(e) {
-                console.error(e);
-                window.showToast("Google Sign-In failed or was cancelled.", "error");
+            } catch(error) {
+                console.error(error);
+                if (error.code === 'auth/unauthorized-domain') {
+                    window.showToast("Google Login Error: Please add this URL to Authorized Domains in Firebase Console.", "error");
+                } else {
+                    window.showToast("Google Sign-In failed or was cancelled.", "error");
+                }
             }
         };
 
-        // Real Official Password Recovery via Firebase
+        // Instant Password Recovery via Database Search (Bypasses email blocks)
         window.handleForgotPassword = async (e) => {
             e.preventDefault();
-            const emailInput = document.getElementById('forgot-email').value.trim();
+            const emailInput = document.getElementById('forgot-email').value.trim().toLowerCase();
             const btn = document.getElementById('forgot-btn');
 
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending Link...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Searching...';
             btn.disabled = true;
 
             try {
-                await sendPasswordResetEmail(auth, emailInput);
-                window.showToast("Reset link sent! Please check your email inbox to create a new password.", "success");
-                setTimeout(() => { window.toggleForms('login'); e.target.reset(); }, 3000);
+                // Search the users collection for this email
+                const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
+                const q = query(usersRef, where('email', '==', emailInput));
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    const userData = querySnapshot.docs[0].data();
+                    
+                    // Display the password directly to the user
+                    window.showToast(`Found it! Your password is: ${userData.password}`, "info");
+                    
+                    setTimeout(() => {
+                        window.toggleForms('login');
+                        document.getElementById('login-identifier').value = userData.username;
+                        e.target.reset();
+                    }, 5000);
+                } else {
+                    window.showToast("No account found with that email address.", "error");
+                }
             } catch (error) {
                 console.error("Recovery Error:", error);
-                window.showToast("Failed to send link. Ensure the email is correct and registered.", "error");
+                window.showToast("Database search failed. Ensure you are connected to the internet.", "error");
             } finally {
-                btn.innerHTML = 'Send Reset Link';
+                btn.innerHTML = 'Find Password';
                 btn.disabled = false;
             }
         };
@@ -596,6 +652,13 @@
             [login, signup, forgot].forEach(form => {
                 form.classList.remove('show-form');
                 form.classList.add('hide-form');
+                
+                // Reset positions
+                if (target === form.id.replace('-form', '')) {
+                    form.classList.remove('absolute', 'top-1/2', '-translate-y-1/2');
+                } else {
+                    form.classList.add('absolute', 'top-1/2', '-translate-y-1/2');
+                }
             });
 
             if (target === 'login') {
@@ -625,7 +688,7 @@
             container.appendChild(toast);
             setTimeout(() => toast.classList.remove('opacity-0', 'translate-y-[-20px]'), 10);
             
-            const displayTime = type === 'info' ? 5000 : 3000;
+            const displayTime = type === 'info' ? 7000 : 3000;
             setTimeout(() => {
                 toast.classList.add('opacity-0');
                 setTimeout(() => toast.remove(), 300);
