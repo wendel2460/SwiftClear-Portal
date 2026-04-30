@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwiftClear - OSAS Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = { theme: { extend: { colors: { chmsu: { green: '#0C5E33', gold: '#FFC72C', dark: '#1F2937' } }, fontFamily: { sans: ['Poppins', 'sans-serif'] } } } }
+    </script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f3f4f6; }
+        .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: slideIn 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <script>
+        const checkUser = JSON.parse(localStorage.getItem('sc_user'));
+        if (!checkUser || !checkUser.username || checkUser.role !== 'OSAS') { window.location.replace('login.html'); }
+    </script>
+
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
+
+    <div id="deficiency-modal" class="fixed inset-0 bg-black/50 z-[60] hidden flex items-center justify-center backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden transform transition-all">
+            <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-users text-teal-500"></i> Record OSAS Hold</h3>
+                <button onclick="closeDeficiencyModal()" class="text-gray-400 hover:text-gray-600 transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-gray-600 mb-4">Record a student affairs deficiency for Student <span id="modal-student-id" class="font-bold text-gray-800"></span>.</p>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Hold Reason / Remark</label>
+                    <input type="text" id="deficiency-remark" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none" placeholder="e.g., Pending community service hours">
+                </div>
+            </div>
+            <div class="p-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50">
+                <button onclick="closeDeficiencyModal()" class="px-4 py-2 text-gray-600 bg-gray-200 rounded-lg text-sm font-medium">Cancel</button>
+                <button onclick="submitDeficiency()" class="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-ban"></i> Place Hold
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <aside class="w-64 bg-chmsu-dark text-white flex flex-col flex-shrink-0 transition-transform duration-300 absolute md:relative z-20 h-full -translate-x-full md:translate-x-0" id="sidebar">
+        <div class="h-16 flex items-center px-6 bg-gray-900 border-b border-gray-800">
+            <div class="w-8 h-8 bg-chmsu-green rounded flex items-center justify-center mr-3"><i class="fa-solid fa-graduation-cap text-chmsu-gold text-sm"></i></div>
+            <span class="text-xl font-bold tracking-wider text-chmsu-gold">SwiftClear</span>
+        </div>
+        <div class="p-6 border-b border-gray-800">
+            <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Department</p>
+            <p class="font-semibold text-chmsu-gold flex items-center gap-2"><i class="fa-solid fa-users"></i> OSAS</p>
+        </div>
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1 px-3" id="sidebar-nav">
+                <li><a href="#" class="flex items-center gap-3 px-3 py-2.5 bg-chmsu-green rounded-lg text-white font-medium"><i class="fa-solid fa-chart-line w-5 text-center"></i> Overview</a></li>
+                <li><a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors"><i class="fa-solid fa-users-viewfinder w-5 text-center"></i> Clearance Queue</a></li>
+            </ul>
+        </nav>
+        <div class="p-4 border-t border-gray-800">
+            <button onclick="logout()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"><i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i> Sign Out</button>
+        </div>
+    </aside>
+
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-10 hidden md:hidden"></div>
+
+    <main class="flex-1 flex flex-col overflow-hidden bg-gray-50 relative">
+        <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-8 shrink-0">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()" class="md:hidden text-gray-500 hover:text-gray-700"><i class="fa-solid fa-bars text-xl"></i></button>
+                <h1 class="text-xl font-bold text-gray-800">OSAS Clearance Overview</h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-right hidden sm:block">
+                    <p id="nav-display-name" class="text-sm font-bold text-gray-800">Loading...</p>
+                    <p class="text-xs text-green-600 font-bold uppercase">Online</p>
+                </div>
+                <div id="nav-avatar" class="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 font-bold border border-teal-200">?</div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-4 lg:p-8 custom-scrollbar relative">
+            <div id="view-dashboard" class="block">
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col w-full">
+                    <div class="p-6 border-b border-gray-200 bg-gray-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <h2 class="text-lg font-bold text-gray-800">OSAS Clearance Queue</h2>
+                            <span class="px-3 py-1 bg-chmsu-green text-white text-[10px] font-bold rounded-full animate-pulse">LIVE SYNC ON</span>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                            <select id="course-filter" class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white outline-none">
+                                <option value="All">All Courses</option>
+                                <option value="BSIS">BSIS</option><option value="BSIT">BSIT</option><option value="BSCE">BSCE</option><option value="BSEd">BSEd</option>
+                            </select>
+                            <div class="relative w-full sm:w-64">
+                                <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" id="search-input" placeholder="Search ID or Name..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm outline-none">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left border-collapse min-w-[850px]">
+                            <thead>
+                                <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
+                                    <th class="p-4 font-semibold border-b border-gray-200 w-1/6">Student ID</th>
+                                    <th class="p-4 font-semibold border-b border-gray-200 w-1/4">Name & Info</th>
+                                    <th class="p-4 font-semibold border-b border-gray-200 w-1/4">OSAS Record</th>
+                                    <th class="p-4 font-semibold border-b border-gray-200 w-1/6">Status</th>
+                                    <th class="p-4 font-semibold border-b border-gray-200 w-1/6 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-table-body" class="text-sm divide-y divide-gray-100">
+                                <tr><td colspan="5" class="p-12 text-center text-gray-400">Connecting to database...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "AIzaSyB5kxApyrtCUXLMiTO4g-kNXZgpWkf1jlg", authDomain: "swiftclear-6195d.firebaseapp.com", projectId: "swiftclear-6195d" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'swiftclear-6195d';
+
+        let sessionUser = { name: 'OSAS Admin' };
+        try { const saved = JSON.parse(localStorage.getItem('sc_user')); if(saved) sessionUser = saved; } catch(e) {}
+        document.getElementById('nav-display-name').innerText = sessionUser.name;
+        document.getElementById('nav-avatar').innerText = sessionUser.name.charAt(0);
+
+        window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebar-overlay').classList.toggle('hidden'); };
+        window.showToast = (msg, type='success') => {
+            const c = document.getElementById('toast-container'); const t = document.createElement('div');
+            t.className = `${type==='success'?'bg-emerald-500':'bg-red-500'} text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 transition-all opacity-0 translate-y-[-20px]`;
+            t.innerHTML = `<i class="fa-solid ${type==='success'?'fa-check-circle':'fa-circle-exclamation'}"></i> <span class="font-medium text-sm">${msg}</span>`;
+            c.appendChild(t); setTimeout(() => t.classList.remove('opacity-0', 'translate-y-[-20px]'), 10);
+            setTimeout(() => { t.classList.add('opacity-0'); setTimeout(()=>t.remove(), 300); }, 3000);
+        };
+
+        let requestsData = [];
+        
+        const initAuth = async () => { try { if (!auth.currentUser) await signInAnonymously(auth); } catch (err) {} };
+        initAuth();
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) return;
+            const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'clearances');
+            onSnapshot(colRef, (snapshot) => {
+                requestsData = [];
+                snapshot.forEach(docSnap => requestsData.push(docSnap.data()));
+                renderTable();
+            });
+        });
+
+        function renderTable() {
+            const tbody = document.getElementById('student-table-body');
+            const searchQ = document.getElementById('search-input').value.toLowerCase();
+            const courseQ = document.getElementById('course-filter').value;
+            
+            let filtered = requestsData.filter(d => {
+                const matchSearch = d.username.toLowerCase().includes(searchQ) || (d.name||'').toLowerCase().includes(searchQ);
+                const matchCourse = courseQ === 'All' || (d.course||'').includes(courseQ) || (d.details||'').includes(courseQ);
+                return matchSearch && matchCourse;
+            });
+
+            tbody.innerHTML = "";
+            if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-400">No requests found.</td></tr>`; return; }
+
+            filtered.sort((a, b) => b.timestamp - a.timestamp).forEach(data => {
+                const status = data.osas || 'Pending';
+                let html, badge, actions;
+
+                if (status === 'Pending') {
+                    html = `<p class="text-sm font-medium text-gray-600"><i class="fa-solid fa-clock text-xs"></i> Awaiting Check</p>`;
+                    badge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700"><i class="fa-solid fa-clock"></i> Pending</span>`;
+                    actions = `<button onclick="window.approve('${data.username}')" class="p-2 bg-emerald-50 text-emerald-600 rounded-lg mx-1"><i class="fa-solid fa-check"></i></button><button onclick="window.openDeficiencyModal('${data.username}')" class="p-2 bg-red-50 text-red-600 rounded-lg mx-1"><i class="fa-solid fa-ban"></i></button>`;
+                } else if (status === 'Approved') {
+                    html = `<p class="text-sm text-emerald-600 font-medium">Cleared</p>`;
+                    badge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700"><i class="fa-solid fa-check"></i> Cleared</span>`;
+                    actions = `<span class="text-xs text-gray-400 italic">Processed</span>`;
+                } else {
+                    html = `<p class="text-sm font-medium text-red-600">Hold</p><p class="text-xs text-red-700">${data.osasRemark||'Action Needed'}</p>`;
+                    badge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700"><i class="fa-solid fa-xmark"></i> Hold</span>`;
+                    actions = `<button onclick="window.approve('${data.username}')" class="p-2 bg-emerald-50 text-emerald-600 rounded-lg mx-1"><i class="fa-solid fa-check"></i></button>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50 animate-fade-in">
+                        <td class="p-4 font-medium">${data.username}</td>
+                        <td class="p-4"><p class="font-bold">${data.name||data.username}</p><p class="text-xs text-gray-400">${data.details||''}</p></td>
+                        <td class="p-4">${html}</td>
+                        <td class="p-4">${badge}</td>
+                        <td class="p-4 text-right">${actions}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        document.getElementById('search-input').addEventListener('input', renderTable);
+        document.getElementById('course-filter').addEventListener('change', renderTable);
+
+        window.approve = async (id) => {
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clearances', id), { osas: 'Approved' });
+            window.showToast(`OSAS clearance approved for ${id}.`);
+        };
+
+        let currentFlagId = null;
+        window.openDeficiencyModal = (id) => { currentFlagId = id; document.getElementById('modal-student-id').textContent = id; document.getElementById('deficiency-modal').classList.remove('hidden'); };
+        window.closeDeficiencyModal = () => document.getElementById('deficiency-modal').classList.add('hidden');
+        window.submitDeficiency = async () => {
+            const rem = document.getElementById('deficiency-remark').value;
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clearances', currentFlagId), { osas: 'Hold', osasRemark: rem });
+            window.showToast("Hold placed.", "error"); window.closeDeficiencyModal();
+        };
+        window.logout = () => { localStorage.clear(); window.location.href = 'login.html'; };
+    </script>
+</body>
+</html>
