@@ -7,20 +7,25 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script>
         tailwind.config = { theme: { extend: { colors: { chmsu: { green: '#0C5E33', gold: '#FFC72C', dark: '#1F2937' } }, fontFamily: { sans: ['Poppins', 'sans-serif'] } } } }
     </script>
+    
     <style>
         body { font-family: 'Poppins', sans-serif; background-color: #f3f4f6; }
         .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .tab-content { display: none; }
+        .tab-content.block { display: block; animation: slideIn 0.3s ease-out forwards; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: slideIn 0.3s ease-out forwards; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
+    <!-- Auth Guard -->
     <script>
         const checkUser = JSON.parse(localStorage.getItem('sc_user'));
         if (!checkUser || !checkUser.username || checkUser.role !== 'OSAS') { window.location.replace('login.html'); }
@@ -50,6 +55,7 @@
         </div>
     </div>
 
+    <!-- Sidebar -->
     <aside class="w-64 bg-chmsu-dark text-white flex flex-col flex-shrink-0 transition-transform duration-300 absolute md:relative z-20 h-full -translate-x-full md:translate-x-0" id="sidebar">
         <div class="h-16 flex items-center px-6 bg-gray-900 border-b border-gray-800">
             <div class="w-8 h-8 bg-chmsu-green rounded flex items-center justify-center mr-3"><i class="fa-solid fa-graduation-cap text-chmsu-gold text-sm"></i></div>
@@ -61,12 +67,12 @@
         </div>
         <nav class="flex-1 overflow-y-auto py-4">
             <ul class="space-y-1 px-3" id="sidebar-nav">
-                <li><a href="#" class="flex items-center gap-3 px-3 py-2.5 bg-chmsu-green rounded-lg text-white font-medium"><i class="fa-solid fa-chart-line w-5 text-center"></i> Overview</a></li>
-                <li><a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors"><i class="fa-solid fa-users-viewfinder w-5 text-center"></i> Clearance Queue</a></li>
+                <li><button onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-link w-full flex items-center gap-3 px-3 py-2.5 bg-chmsu-green rounded-lg text-white font-medium"><i class="fa-solid fa-chart-line w-5 text-center"></i> Overview</button></li>
+                <li><button onclick="switchTab('queue')" id="nav-queue" class="sidebar-link w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors"><i class="fa-solid fa-users-viewfinder w-5 text-center"></i> Clearance Queue</button></li>
             </ul>
         </nav>
         <div class="p-4 border-t border-gray-800">
-            <button onclick="logout()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"><i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i> Sign Out</button>
+            <button onclick="logout()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"><i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i> Sign Out</button>
         </div>
     </aside>
 
@@ -88,7 +94,7 @@
         </header>
 
         <div class="flex-1 overflow-y-auto p-4 lg:p-8 custom-scrollbar relative">
-            <div id="view-dashboard" class="block">
+            <div id="view-dashboard" class="tab-content block">
                 <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col w-full">
                     <div class="p-6 border-b border-gray-200 bg-gray-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div class="flex items-center gap-3">
@@ -96,10 +102,12 @@
                             <span class="px-3 py-1 bg-chmsu-green text-white text-[10px] font-bold rounded-full animate-pulse">LIVE SYNC ON</span>
                         </div>
                         <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                            <!-- COURSE FILTER -->
                             <select id="course-filter" class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white outline-none">
                                 <option value="All">All Courses</option>
                                 <option value="BSIS">BSIS</option><option value="BSIT">BSIT</option><option value="BSCE">BSCE</option><option value="BSEd">BSEd</option>
                             </select>
+                            <!-- SEARCH BAR -->
                             <div class="relative w-full sm:w-64">
                                 <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                                 <input type="text" id="search-input" placeholder="Search ID or Name..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm outline-none">
@@ -110,29 +118,38 @@
                         <table class="w-full text-left border-collapse min-w-[850px]">
                             <thead>
                                 <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
-                                    <th class="p-4 font-semibold border-b border-gray-200 w-1/6">Student ID</th>
-                                    <th class="p-4 font-semibold border-b border-gray-200 w-1/4">Name & Info</th>
-                                    <th class="p-4 font-semibold border-b border-gray-200 w-1/4">OSAS Record</th>
-                                    <th class="p-4 font-semibold border-b border-gray-200 w-1/6">Status</th>
-                                    <th class="p-4 font-semibold border-b border-gray-200 w-1/6 text-right">Actions</th>
+                                    <th class="p-4 border-b w-1/6">Student ID</th><th class="p-4 border-b w-1/4">Name & Course</th><th class="p-4 border-b w-1/4">OSAS Record</th><th class="p-4 border-b w-1/6">Status</th><th class="p-4 border-b w-1/6 text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="student-table-body" class="text-sm divide-y divide-gray-100">
-                                <tr><td colspan="5" class="p-12 text-center text-gray-400">Connecting to database...</td></tr>
+                                <tr><td colspan="5" class="p-12 text-center text-gray-400">Connecting...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
+            </div>
+            
+            <div id="view-queue" class="hidden tab-content p-8 text-center text-gray-500">
+                <i class="fa-solid fa-users text-4xl mb-4"></i><p>Full Queue View is currently displayed on the main dashboard.</p>
+                <button onclick="switchTab('dashboard')" class="mt-4 px-4 py-2 bg-chmsu-green text-white rounded-lg">Go Back</button>
             </div>
         </div>
     </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "AIzaSyB5kxApyrtCUXLMiTO4g-kNXZgpWkf1jlg", authDomain: "swiftclear-6195d.firebaseapp.com", projectId: "swiftclear-6195d" };
+        const userFirebaseConfig = {
+            apiKey: "AIzaSyB5kxApyrtCUXLMiTO4g-kNXZgpWkf1jlg",
+            authDomain: "swiftclear-6195d.firebaseapp.com",
+            projectId: "swiftclear-6195d",
+            storageBucket: "swiftclear-6195d.firebasestorage.app",
+            messagingSenderId: "386476383105",
+            appId: "1:386476383105:web:2d706ae20c19b2a633e680"
+        };
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : userFirebaseConfig;
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -144,16 +161,23 @@
         document.getElementById('nav-avatar').innerText = sessionUser.name.charAt(0);
 
         window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebar-overlay').classList.toggle('hidden'); };
+        window.switchTab = (tabId) => {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('block'));
+            document.getElementById(`view-${tabId}`).classList.add('block');
+            document.querySelectorAll('.sidebar-link').forEach(el => el.className = 'sidebar-link w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors');
+            document.getElementById(`nav-${tabId}`).className = 'sidebar-link w-full flex items-center gap-3 px-3 py-2.5 bg-chmsu-green rounded-lg text-white font-medium';
+            if(window.innerWidth < 768) window.toggleSidebar();
+        };
         window.showToast = (msg, type='success') => {
             const c = document.getElementById('toast-container'); const t = document.createElement('div');
-            t.className = `${type==='success'?'bg-emerald-500':'bg-red-500'} text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 transition-all opacity-0 translate-y-[-20px]`;
+            t.className = `${type==='success'?'bg-emerald-500':'bg-red-500'} text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 transition-all opacity-0 translate-y-[-20px] z-50`;
             t.innerHTML = `<i class="fa-solid ${type==='success'?'fa-check-circle':'fa-circle-exclamation'}"></i> <span class="font-medium text-sm">${msg}</span>`;
             c.appendChild(t); setTimeout(() => t.classList.remove('opacity-0', 'translate-y-[-20px]'), 10);
             setTimeout(() => { t.classList.add('opacity-0'); setTimeout(()=>t.remove(), 300); }, 3000);
         };
 
-        let requestsData = [];
-        
+        let globalRequestsData = [];
+
         const initAuth = async () => { try { if (!auth.currentUser) await signInAnonymously(auth); } catch (err) {} };
         initAuth();
 
@@ -162,8 +186,8 @@
             const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'clearances');
             
             onSnapshot(colRef, (snapshot) => {
-                requestsData = [];
-                snapshot.forEach(docSnap => requestsData.push(docSnap.data()));
+                globalRequestsData = [];
+                snapshot.forEach(docSnap => globalRequestsData.push(docSnap.data()));
                 renderTable();
             }, (err) => {
                 console.error(err);
@@ -176,9 +200,9 @@
             const searchQ = document.getElementById('search-input').value.toLowerCase();
             const courseQ = document.getElementById('course-filter').value;
             
-            let filtered = requestsData.filter(d => {
-                const matchSearch = d.username.toLowerCase().includes(searchQ) || (d.name||'').toLowerCase().includes(searchQ);
-                const matchCourse = courseQ === 'All' || (d.course||'').includes(courseQ) || (d.details||'').includes(courseQ);
+            let filtered = globalRequestsData.filter(d => {
+                const matchSearch = (d.username||'').toLowerCase().includes(searchQ) || (d.name||'').toLowerCase().includes(searchQ);
+                const matchCourse = courseQ === 'All' || (d.details||'').includes(courseQ);
                 return matchSearch && matchCourse;
             });
 
@@ -192,7 +216,7 @@
                 if (status === 'Pending') {
                     html = `<p class="text-sm font-medium text-gray-600"><i class="fa-solid fa-clock text-xs"></i> Awaiting Check</p>`;
                     badge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700"><i class="fa-solid fa-clock"></i> Pending</span>`;
-                    actions = `<button onclick="window.approve('${data.username}')" class="p-2 bg-emerald-50 text-emerald-600 rounded-lg mx-1"><i class="fa-solid fa-check"></i></button><button onclick="window.openDeficiencyModal('${data.username}')" class="p-2 bg-red-50 text-red-600 rounded-lg mx-1"><i class="fa-solid fa-ban"></i></button>`;
+                    actions = `<button onclick="window.approve('${data.username}')" class="p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-lg mx-1"><i class="fa-solid fa-check"></i></button><button onclick="window.openDeficiencyModal('${data.username}')" class="p-2 bg-red-50 text-red-600 hover:bg-red-500 hover:text-white rounded-lg mx-1"><i class="fa-solid fa-ban"></i></button>`;
                 } else if (status === 'Approved') {
                     html = `<p class="text-sm text-emerald-600 font-medium">Cleared</p>`;
                     badge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700"><i class="fa-solid fa-check"></i> Cleared</span>`;
@@ -200,7 +224,7 @@
                 } else {
                     html = `<p class="text-sm font-medium text-red-600">Hold</p><p class="text-xs text-red-700">${data.osasRemark||'Action Needed'}</p>`;
                     badge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700"><i class="fa-solid fa-xmark"></i> Hold</span>`;
-                    actions = `<button onclick="window.approve('${data.username}')" class="p-2 bg-emerald-50 text-emerald-600 rounded-lg mx-1"><i class="fa-solid fa-check"></i></button>`;
+                    actions = `<button onclick="window.approve('${data.username}')" class="p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-lg mx-1"><i class="fa-solid fa-check"></i></button>`;
                 }
 
                 tbody.innerHTML += `
@@ -218,16 +242,13 @@
         document.getElementById('search-input').addEventListener('input', renderTable);
         document.getElementById('course-filter').addEventListener('change', renderTable);
 
-        window.approve = async (id) => {
-            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clearances', id), { osas: 'Approved' });
-            window.showToast(`OSAS clearance approved for ${id}.`);
-        };
-
+        window.approve = async (id) => { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clearances', id), { osas: 'Approved' }); window.showToast("Approved."); };
         let currentFlagId = null;
         window.openDeficiencyModal = (id) => { currentFlagId = id; document.getElementById('modal-student-id').textContent = id; document.getElementById('deficiency-modal').classList.remove('hidden'); };
         window.closeDeficiencyModal = () => document.getElementById('deficiency-modal').classList.add('hidden');
         window.submitDeficiency = async () => {
             const rem = document.getElementById('deficiency-remark').value;
+            if(!rem) return window.showToast("Enter remark", "error");
             await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clearances', currentFlagId), { osas: 'Hold', osasRemark: rem });
             window.showToast("Hold placed.", "error"); window.closeDeficiencyModal();
         };
