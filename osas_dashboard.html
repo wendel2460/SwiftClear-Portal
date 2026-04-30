@@ -160,10 +160,14 @@
         onAuthStateChanged(auth, (user) => {
             if (!user) return;
             const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'clearances');
+            
             onSnapshot(colRef, (snapshot) => {
                 requestsData = [];
                 snapshot.forEach(docSnap => requestsData.push(docSnap.data()));
                 renderTable();
+            }, (err) => {
+                console.error(err);
+                document.getElementById('student-table-body').innerHTML = `<tr><td colspan="5" class="p-4 text-red-500 text-center">Connection error. Check console.</td></tr>`;
             });
         });
 
