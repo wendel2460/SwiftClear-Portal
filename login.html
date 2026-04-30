@@ -497,14 +497,15 @@
 
                 // If user entered a Student ID (no @ symbol), look up their email in Firestore
                 if (!identifier.includes('@')) {
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', identifier);
-                    const docSnap = await getDoc(docRef);
+                    const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
+                    const q = query(usersRef, where('username', '==', identifier));
+                    const qSnap = await getDocs(q);
                     
-                    if (!docSnap.exists()) {
+                    if (qSnap.empty) {
                         window.showToast("Student ID not found. Please register.", "error");
                         btn.innerHTML = 'Sign In'; btn.disabled = false; return;
                     }
-                    emailToLogin = docSnap.data().email;
+                    emailToLogin = qSnap.docs[0].data().email;
                 }
 
                 // Secure Firebase Login
