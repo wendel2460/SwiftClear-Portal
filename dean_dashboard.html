@@ -3,25 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SwiftClear - College Dean Dashboard</title>
-    <!-- Tailwind CSS -->
+    <title>SwiftClear - Dean Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        chmsu: { green: '#0C5E33', gold: '#FFC72C', dark: '#1F2937' }
-                    },
-                    fontFamily: { sans: ['Poppins', 'sans-serif'] }
-                }
-            }
-        }
+        tailwind.config = { theme: { extend: { colors: { chmsu: { green: '#0C5E33', gold: '#FFC72C', dark: '#1F2937' } }, fontFamily: { sans: ['Poppins', 'sans-serif'] } } } }
     </script>
     
     <style>
@@ -29,56 +17,44 @@
         .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .tab-content { display: none; }
+        .tab-content.block { display: block; animation: slideIn 0.3s ease-out forwards; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: slideIn 0.3s ease-out forwards; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
-    <!-- Auth Guard Pre-Check (Runs immediately to prevent URL bypassing) -->
+    <!-- Auth Guard -->
     <script>
         const checkUser = JSON.parse(localStorage.getItem('sc_user'));
-        // Only allow users with the 'College Dean' role to access this page
-        if (!checkUser || !checkUser.username || checkUser.role !== 'College Dean') {
-            window.location.replace('login.html'); 
-        }
+        if (!checkUser || !checkUser.username || checkUser.role !== 'College Dean') { window.location.replace('login.html'); }
     </script>
 
-    <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
 
-    <!-- Academic Deficiency Modal -->
+    <!-- Academic Hold Modal -->
     <div id="deficiency-modal" class="fixed inset-0 bg-black/50 z-[60] hidden flex items-center justify-center backdrop-blur-sm transition-opacity">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden transform transition-all">
             <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
-                    <i class="fa-solid fa-triangle-exclamation text-orange-500"></i> Record Academic Hold
-                </h3>
-                <button onclick="closeDeficiencyModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
-                    <i class="fa-solid fa-xmark text-xl"></i>
-                </button>
+                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation text-orange-500"></i> Record Academic Hold</h3>
+                <button onclick="closeDeficiencyModal()" class="text-gray-400 hover:text-gray-600 transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <div class="p-6">
-                <p class="text-sm text-gray-600 mb-4">Record an academic deficiency (e.g., INC grade, missing thesis) for Student <span id="modal-student-id" class="font-bold text-gray-800"></span>. This will prevent final academic clearance.</p>
+                <p class="text-sm text-gray-600 mb-4">Record an academic deficiency for Student <span id="modal-student-id" class="font-bold text-gray-800"></span>.</p>
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Academic Issue Description</label>
-                    <select id="deficiency-remark" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all mb-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Issue Description</label>
+                    <select id="deficiency-remark" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm outline-none">
                         <option value="Incomplete (INC) Grade">Incomplete (INC) Grade</option>
                         <option value="Missing Hardbound Thesis">Missing Hardbound Thesis</option>
                         <option value="Lacking Prerequisite">Lacking Prerequisite Subject</option>
                         <option value="Other">Other Academic Hold</option>
                     </select>
                 </div>
-                <div class="mb-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Subject / Course Code (Optional)</label>
-                    <input type="text" id="deficiency-course" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all" placeholder="e.g., IT 312, CAPSTONE 2">
-                </div>
             </div>
             <div class="p-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50">
-                <button onclick="closeDeficiencyModal()" class="px-4 py-2 text-gray-600 bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-medium transition-colors">Cancel</button>
-                <button onclick="submitDeficiency()" class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center gap-2">
-                    <i class="fa-solid fa-flag"></i> Flag Academic Hold
+                <button onclick="closeDeficiencyModal()" class="px-4 py-2 text-gray-600 bg-gray-200 rounded-lg text-sm font-medium">Cancel</button>
+                <button onclick="submitDeficiency()" class="px-4 py-2 bg-orange-500 text-white rounded-lg text-sm font-medium shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-flag"></i> Flag Student
                 </button>
             </div>
         </div>
@@ -87,425 +63,275 @@
     <!-- Sidebar -->
     <aside class="w-64 bg-chmsu-dark text-white flex flex-col flex-shrink-0 transition-transform duration-300 absolute md:relative z-20 h-full -translate-x-full md:translate-x-0" id="sidebar">
         <div class="h-16 flex items-center px-6 bg-gray-900 border-b border-gray-800">
-            <div class="w-8 h-8 bg-chmsu-green rounded flex items-center justify-center mr-3">
-                <i class="fa-solid fa-graduation-cap text-chmsu-gold text-sm"></i>
-            </div>
+            <div class="w-8 h-8 bg-chmsu-green rounded flex items-center justify-center mr-3"><i class="fa-solid fa-graduation-cap text-chmsu-gold text-sm"></i></div>
             <span class="text-xl font-bold tracking-wider text-chmsu-gold">SwiftClear</span>
         </div>
-
         <div class="p-6 border-b border-gray-800">
             <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Department</p>
-            <p class="font-semibold text-chmsu-gold flex items-center gap-2">
-                <i class="fa-solid fa-user-tie"></i> CICT Dean's Office
-            </p>
+            <p class="font-semibold text-chmsu-gold flex items-center gap-2"><i class="fa-solid fa-user-tie"></i> Dean's Office</p>
         </div>
-
         <nav class="flex-1 overflow-y-auto py-4">
             <ul class="space-y-1 px-3" id="sidebar-nav">
-                <li>
-                    <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="flex items-center gap-3 px-3 py-2.5 bg-chmsu-green rounded-lg text-white font-medium transition-colors">
-                        <i class="fa-solid fa-chart-line w-5 text-center"></i> Overview
-                    </a>
-                </li>
-                <li>
-                    <a href="#" onclick="switchTab('academic')" id="nav-academic" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
-                        <i class="fa-solid fa-book-open w-5 text-center"></i> Academic Records
-                    </a>
-                </li>
-                <li>
-                    <a href="#" onclick="switchTab('thesis')" id="nav-thesis" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
-                        <i class="fa-solid fa-book-bookmark w-5 text-center"></i> Thesis / Capstone
-                    </a>
-                </li>
-                <li>
-                    <a href="#" onclick="switchTab('graduating')" id="nav-graduating" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
-                        <i class="fa-solid fa-user-graduate w-5 text-center"></i> Graduating List
-                    </a>
-                </li>
-                <li>
-                    <a href="#" onclick="switchTab('settings')" id="nav-settings" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-colors mt-4">
-                        <i class="fa-solid fa-sliders w-5 text-center"></i> Dept Settings
-                    </a>
-                </li>
+                <li><button onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-link w-full flex items-center gap-3 px-3 py-2.5 bg-chmsu-green rounded-lg text-white font-medium"><i class="fa-solid fa-chart-line w-5 text-center"></i> Overview</button></li>
+                <li><button onclick="switchTab('graduating')" id="nav-graduating" class="sidebar-link w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors"><i class="fa-solid fa-user-graduate w-5 text-center"></i> Graduating List</button></li>
+                <li><button onclick="switchTab('queue')" id="nav-queue" class="sidebar-link w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors"><i class="fa-solid fa-users-viewfinder w-5 text-center"></i> Clearance Queue</button></li>
             </ul>
         </nav>
-
         <div class="p-4 border-t border-gray-800">
-            <button onclick="logout()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors">
-                <i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i> Sign Out
-            </button>
+            <button onclick="logout()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"><i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i> Sign Out</button>
         </div>
     </aside>
 
-    <!-- Overlay for mobile sidebar -->
     <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-10 hidden md:hidden"></div>
 
-    <!-- Main Content -->
     <main class="flex-1 flex flex-col overflow-hidden bg-gray-50 relative">
-        
-        <!-- Header -->
         <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-8 shrink-0">
             <div class="flex items-center gap-4">
-                <button onclick="toggleSidebar()" class="md:hidden text-gray-500 hover:text-gray-700">
-                    <i class="fa-solid fa-bars text-xl"></i>
-                </button>
-                <h1 id="header-title" class="text-xl font-bold text-gray-800">Academic Clearance Overview</h1>
+                <button onclick="toggleSidebar()" class="md:hidden text-gray-500 hover:text-gray-700"><i class="fa-solid fa-bars text-xl"></i></button>
+                <h1 id="header-title" class="text-xl font-bold text-gray-800">Academic Clearance</h1>
             </div>
-
             <div class="flex items-center gap-4">
-                <div class="relative cursor-pointer" onclick="showToast('No new notifications', 'info')">
-                    <i class="fa-regular fa-bell text-gray-500 text-xl hover:text-chmsu-green transition-colors"></i>
-                    <div class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></div>
+                <div class="text-right hidden sm:block">
+                    <p id="nav-display-name" class="text-sm font-bold text-gray-800">Loading...</p>
+                    <p class="text-xs text-green-600 font-bold uppercase">Online</p>
                 </div>
-                <div class="h-8 w-px bg-gray-200 mx-2"></div>
-                <div class="flex items-center gap-3">
-                    <div class="text-right hidden sm:block">
-                        <p id="nav-display-name" class="text-sm font-bold text-gray-800">Loading...</p>
-                        <p class="text-xs text-green-600 font-bold uppercase">Online & Syncing</p>
-                    </div>
-                    <img id="nav-avatar" src="" alt="Profile" class="w-10 h-10 rounded-full border border-gray-200 shadow-sm bg-gray-100">
-                </div>
+                <img id="nav-avatar" src="" class="w-10 h-10 rounded-full border border-gray-200 shadow-sm bg-gray-100">
             </div>
         </header>
 
-        <!-- Content Scroll Area -->
         <div class="flex-1 overflow-y-auto p-4 lg:p-8 custom-scrollbar relative">
-            
-            <!-- VIEW: DASHBOARD (Main Default View) -->
-            <div id="view-dashboard" class="block">
-                
-                <!-- Statistics Cards -->
+            <div id="view-dashboard" class="tab-content block">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 w-full">
-                    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4 w-full">
-                        <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 text-xl shrink-0">
-                            <i class="fa-solid fa-users"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-500 font-medium line-clamp-1">CICT Enrollees</p>
-                            <p id="stat-total" class="text-2xl font-bold text-gray-800">0</p>
-                        </div>
-                    </div>
-                    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4 w-full">
-                        <div class="w-12 h-12 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-600 text-xl shrink-0">
-                            <i class="fa-solid fa-file-circle-question"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-500 font-medium line-clamp-1">Pending Review</p>
-                            <p id="stat-pending" class="text-2xl font-bold text-gray-800">0</p>
-                        </div>
-                    </div>
-                    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4 w-full">
-                        <div class="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center text-orange-500 text-xl shrink-0">
-                            <i class="fa-solid fa-file-circle-xmark"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-500 font-medium line-clamp-1">Academic Holds</p>
-                            <p id="stat-hold" class="text-2xl font-bold text-gray-800">0</p>
-                        </div>
-                    </div>
-                    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4 w-full">
-                        <div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500 text-xl shrink-0">
-                            <i class="fa-solid fa-award"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-500 font-medium line-clamp-1">Academically Cleared</p>
-                            <p id="stat-cleared" class="text-2xl font-bold text-gray-800">0</p>
-                        </div>
-                    </div>
+                    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 text-xl"><i class="fa-solid fa-users"></i></div><div><p class="text-sm text-gray-500 font-medium">Enrollees</p><p id="stat-total" class="text-2xl font-bold">0</p></div></div>
+                    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-600 text-xl"><i class="fa-solid fa-file-circle-question"></i></div><div><p class="text-sm text-gray-500 font-medium">Pending Review</p><p id="stat-pending" class="text-2xl font-bold">0</p></div></div>
+                    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center text-orange-500 text-xl"><i class="fa-solid fa-file-circle-xmark"></i></div><div><p class="text-sm text-gray-500 font-medium">Academic Holds</p><p id="stat-hold" class="text-2xl font-bold">0</p></div></div>
+                    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500 text-xl"><i class="fa-solid fa-award"></i></div><div><p class="text-sm text-gray-500 font-medium">Cleared</p><p id="stat-cleared" class="text-2xl font-bold">0</p></div></div>
                 </div>
 
-                <!-- Main Table Section -->
                 <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col w-full">
-                    <!-- Table Header & Controls -->
                     <div class="p-6 border-b border-gray-200 bg-gray-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <div class="flex items-center gap-3">
-                            <h2 class="text-lg font-bold text-gray-800">Academic Clearance Queue</h2>
-                            <span class="px-3 py-1 bg-chmsu-green text-white text-[10px] font-bold rounded-full animate-pulse">LIVE SYNC ON</span>
-                        </div>
-                        
-                        <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <h2 class="text-lg font-bold text-gray-800">Clearance Queue</h2>
+                        <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                            <!-- COURSE FILTER -->
+                            <select id="course-filter" class="px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none">
+                                <option value="All">All Courses</option>
+                                <option value="BSIS">BSIS</option><option value="BSIT">BSIT</option><option value="BSCE">BSCE</option><option value="BSEd">BSEd</option><option value="BSHM">BSHM</option>
+                            </select>
+                            <!-- SEARCH BAR -->
                             <div class="relative w-full sm:w-64">
                                 <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                <input type="text" placeholder="Search ID or Name..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none">
+                                <input type="text" id="search-input" placeholder="Search ID or Name..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm outline-none">
                             </div>
                         </div>
                     </div>
-
-                    <!-- Table -->
                     <div class="overflow-x-auto custom-scrollbar">
                         <table class="w-full text-left border-collapse min-w-[850px]">
                             <thead>
                                 <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
-                                    <th class="p-4 font-semibold border-b border-gray-200 w-1/6">Student ID</th>
-                                    <th class="p-4 font-semibold border-b border-gray-200 w-1/4">Name & Info</th>
-                                    <th class="p-4 font-semibold border-b border-gray-200 w-1/4">Academic Record</th>
-                                    <th class="p-4 font-semibold border-b border-gray-200 w-1/6">Status</th>
-                                    <th class="p-4 font-semibold border-b border-gray-200 w-1/6 text-right">Actions</th>
+                                    <th class="p-4 border-b w-1/6">Student ID</th><th class="p-4 border-b w-1/4">Name & Course</th><th class="p-4 border-b w-1/4">Academic Record</th><th class="p-4 border-b w-1/6">Status</th><th class="p-4 border-b w-1/6 text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="student-table-body" class="text-sm divide-y divide-gray-100">
-                                <!-- Rendered via JavaScript -->
-                                <tr>
-                                    <td colspan="5" class="p-12 text-center text-gray-400">
-                                        <i class="fa-solid fa-satellite-dish animate-bounce text-4xl mb-3"></i>
-                                        <p>Connecting to database...</p>
-                                    </td>
-                                </tr>
+                                <tr><td colspan="5" class="p-12 text-center text-gray-400">Connecting...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-            </div> <!-- End of VIEW: DASHBOARD -->
+            </div>
 
-            <!-- Placeholder Views for other Tabs -->
-            <div id="view-academic" class="hidden h-full flex flex-col items-center justify-center text-center p-8 mt-12 animate-[fadeIn_0.3s_ease-in-out]">
-                <div class="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 mb-4 mx-auto"><i class="fa-solid fa-book-open text-4xl"></i></div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-2">Academic Records Directory</h2>
-                <button onclick="switchTab('dashboard')" class="mt-6 px-5 py-2.5 bg-chmsu-green text-white rounded-lg text-sm font-medium">Return to Overview</button>
+            <!-- GRADUATING LIST -->
+            <div id="view-graduating" class="hidden tab-content">
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col w-full">
+                    <div class="p-6 border-b border-gray-200 bg-gray-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-gray-800"><i class="fa-solid fa-user-graduate text-chmsu-green mr-2"></i> 4th Year Graduating Candidates</h2>
+                            <p class="text-xs text-gray-500 mt-1">Filtered specifically for students in Year Level 4.</p>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
+                                    <th class="p-4 border-b">Student ID</th><th class="p-4 border-b">Name</th><th class="p-4 border-b">Course & Section</th><th class="p-4 border-b">Clearance Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="graduating-table-body" class="text-sm divide-y divide-gray-100">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
             
-            <div id="view-thesis" class="hidden h-full flex flex-col items-center justify-center text-center p-8 mt-12 animate-[fadeIn_0.3s_ease-in-out]">
-                <div class="w-24 h-24 bg-purple-50 rounded-full flex items-center justify-center text-purple-600 mb-4 mx-auto"><i class="fa-solid fa-book-bookmark text-4xl"></i></div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-2">Thesis & Capstone Tracking</h2>
-                <button onclick="switchTab('dashboard')" class="mt-6 px-5 py-2.5 bg-chmsu-green text-white rounded-lg text-sm font-medium">Return to Overview</button>
+            <div id="view-queue" class="hidden tab-content p-8 text-center text-gray-500">
+                <i class="fa-solid fa-users text-4xl mb-4"></i><p>Full Queue View is currently displayed on the main dashboard.</p>
+                <button onclick="switchTab('dashboard')" class="mt-4 px-4 py-2 bg-chmsu-green text-white rounded-lg">Go Back</button>
             </div>
-            
-            <div id="view-graduating" class="hidden h-full flex flex-col items-center justify-center text-center p-8 mt-12 animate-[fadeIn_0.3s_ease-in-out]">
-                <div class="w-24 h-24 bg-yellow-50 rounded-full flex items-center justify-center text-yellow-600 mb-4 mx-auto"><i class="fa-solid fa-user-graduate text-4xl"></i></div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-2">Candidates for Graduation</h2>
-                <button onclick="switchTab('dashboard')" class="mt-6 px-5 py-2.5 bg-chmsu-green text-white rounded-lg text-sm font-medium">Return to Overview</button>
-            </div>
-
-            <div id="view-settings" class="hidden h-full flex flex-col items-center justify-center text-center p-8 mt-12 animate-[fadeIn_0.3s_ease-in-out]">
-                <div class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 mb-4 mx-auto"><i class="fa-solid fa-sliders text-4xl"></i></div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-2">Department Settings</h2>
-                <button onclick="switchTab('dashboard')" class="mt-6 px-5 py-2.5 bg-chmsu-green text-white rounded-lg text-sm font-medium">Return to Overview</button>
-            </div>
-
-            <div class="h-8"></div>
         </div>
     </main>
 
-    <!-- Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Setup Firebase
-        const userFirebaseConfig = {
-            apiKey: "AIzaSyB5kxApyrtCUXLMiTO4g-kNXZgpWkf1jlg",
-            authDomain: "swiftclear-6195d.firebaseapp.com",
-            projectId: "swiftclear-6195d",
-            storageBucket: "swiftclear-6195d.firebasestorage.app",
-            messagingSenderId: "386476383105",
-            appId: "1:386476383105:web:2d706ae20c19b2a633e680",
-            measurementId: "G-K4FRYKDS8P"
-        };
-
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : userFirebaseConfig;
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "AIzaSyB5kxApyrtCUXLMiTO4g-kNXZgpWkf1jlg", authDomain: "swiftclear-6195d.firebaseapp.com", projectId: "swiftclear-6195d" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'swiftclear-6195d';
 
-        // --- DYNAMIC USER DATA ---
-        let sessionUser = { name: 'Dean of CICT' };
-        try {
-            const saved = JSON.parse(localStorage.getItem('sc_user'));
-            if(saved && saved.name) sessionUser = saved;
-        } catch(e) {}
-        
-        const adminName = sessionUser.name;
-        
-        document.getElementById('nav-display-name').innerText = adminName;
-        document.getElementById('nav-avatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(adminName)}&background=0C5E33&color=fff`;
+        let sessionUser = { name: 'Dean Admin' };
+        try { const saved = JSON.parse(localStorage.getItem('sc_user')); if(saved) sessionUser = saved; } catch(e) {}
+        document.getElementById('nav-display-name').innerText = sessionUser.name;
+        document.getElementById('nav-avatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(sessionUser.name)}&background=0C5E33&color=fff`;
 
-        // --- UI & Utility Functions attached to window ---
-        window.toggleSidebar = () => {
-            document.getElementById('sidebar').classList.toggle('-translate-x-full');
-            document.getElementById('sidebar-overlay').classList.toggle('hidden');
-        };
-
-        window.showToast = (message, type = 'success') => {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            const bgColor = type === 'success' ? 'bg-emerald-500' : (type === 'info' ? 'bg-blue-500' : (type === 'warning' ? 'bg-orange-500' : 'bg-red-500'));
-            const icon = type === 'success' ? 'fa-check-circle' : (type === 'info' ? 'fa-circle-info' : 'fa-circle-exclamation');
-
-            toast.className = `${bgColor} text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-y-[-20px] opacity-0 z-50`;
-            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span class="font-medium text-sm">${message}</span>`;
-            
-            container.appendChild(toast);
-            setTimeout(() => toast.classList.remove('translate-y-[-20px]', 'opacity-0'), 10);
-            setTimeout(() => { toast.classList.add('opacity-0'); setTimeout(() => toast.remove(), 300); }, 3000);
-        };
-
+        window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebar-overlay').classList.toggle('hidden'); };
         window.switchTab = (tabId) => {
-            const titles = { 'dashboard': 'Academic Clearance Overview', 'academic': 'Academic Records', 'thesis': 'Thesis & Capstone Tracking', 'graduating': 'Candidates for Graduation', 'settings': 'Department Settings' };
-            const views = ['dashboard', 'academic', 'thesis', 'graduating', 'settings'];
-            
-            views.forEach(view => {
-                document.getElementById(`view-${view}`).classList.add('hidden');
-                document.getElementById(`view-${view}`).classList.remove('block');
-                document.getElementById(`nav-${view}`).className = "flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-colors";
-            });
-
-            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('block'));
             document.getElementById(`view-${tabId}`).classList.add('block');
-            document.getElementById(`nav-${tabId}`).className = "flex items-center gap-3 px-3 py-2.5 bg-chmsu-green rounded-lg text-white font-medium transition-colors";
-            document.getElementById('header-title').innerText = titles[tabId];
-
-            if (window.innerWidth < 768) window.toggleSidebar();
+            document.querySelectorAll('.sidebar-link').forEach(el => el.className = 'sidebar-link w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors');
+            document.getElementById(`nav-${tabId}`).className = 'sidebar-link w-full flex items-center gap-3 px-3 py-2.5 bg-chmsu-green rounded-lg text-white font-medium';
+            if(window.innerWidth < 768) window.toggleSidebar();
+        };
+        window.showToast = (msg, type='success') => {
+            const c = document.getElementById('toast-container'); const t = document.createElement('div');
+            t.className = `${type==='success'?'bg-emerald-500':'bg-red-500'} text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 transform opacity-0 translate-y-[-20px] transition-all z-50`;
+            t.innerHTML = `<i class="fa-solid ${type==='success'?'fa-check-circle':'fa-circle-exclamation'}"></i> <span class="font-medium text-sm">${msg}</span>`;
+            c.appendChild(t); setTimeout(() => t.classList.remove('translate-y-[-20px]', 'opacity-0'), 10);
+            setTimeout(() => { t.classList.add('opacity-0'); setTimeout(() => t.remove(), 300); }, 3000);
         };
 
-        // --- Firebase Real-time Integration ---
-        const initAuth = async () => {
-            try {
-                if (!auth.currentUser) await signInAnonymously(auth);
-            } catch (err) { console.error("Auth Error:", err); }
-        };
+        let globalRequestsData = [];
+
+        const initAuth = async () => { try { if (!auth.currentUser) await signInAnonymously(auth); } catch (err) {} };
         initAuth();
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (!user) return;
-
             const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'clearances');
             
-            onSnapshot(colRef, (snapshot) => {
-                const tbody = document.getElementById('student-table-body');
-                let totalCount = 0, pendingCount = 0, holdCount = 0, clearedCount = 0;
+            onSnapshot(colRef, async (snapshot) => {
+                const usersSnap = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', 'users'));
+                const usersMap = {};
+                usersSnap.forEach(u => usersMap[u.id] = u.data());
+
+                let tot=0, pen=0, hol=0, cle=0;
+                globalRequestsData = [];
                 
-                const requests = [];
                 snapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    totalCount++;
+                    let data = docSnap.data();
+                    let uData = usersMap[data.username] || {};
+                    data.course = uData.course || '';
+                    data.details = uData.details || '';
+                    data.yearLevel = String(uData.yearLevel || ''); // Store year level for Graduating Filter
+                    tot++;
                     
-                    const deanStatus = data.dean || 'Pending';
-                    if (deanStatus === 'Pending') pendingCount++;
-                    else if (deanStatus === 'Approved') clearedCount++;
-                    else holdCount++; // Hold or Action Needed
-                    
-                    requests.push(data);
-                });
-
-                // Update Stat Cards
-                document.getElementById('stat-total').innerText = totalCount;
-                document.getElementById('stat-pending').innerText = pendingCount;
-                document.getElementById('stat-hold').innerText = holdCount;
-                document.getElementById('stat-cleared').innerText = clearedCount;
-
-                tbody.innerHTML = "";
-                
-                if (requests.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-12 text-center text-gray-400"><i class="fa-solid fa-inbox text-5xl mb-4 opacity-20"></i><p>No clearance requests found.</p></td></tr>`;
-                    return;
-                }
-
-                // Sort newest first
-                requests.sort((a, b) => b.timestamp - a.timestamp).forEach(data => {
                     const status = data.dean || 'Pending';
-                    const reqDate = new Date(data.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    if (status === 'Pending') pen++;
+                    else if (status === 'Approved') cle++;
+                    else hol++;
                     
-                    let academicHtml, badgeHtml, actionHtml;
-
-                    if (status === 'Pending') {
-                        academicHtml = `<p class="text-sm font-medium text-gray-600"><i class="fa-solid fa-clock text-xs"></i> All Grades Submitted</p><p class="text-xs text-gray-500">No failing marks / INC recorded</p>`;
-                        badgeHtml = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700 border border-yellow-200"><i class="fa-solid fa-clock"></i> Pending Review</span>`;
-                        actionHtml = `
-                            <button onclick="window.approve('${data.username}')" class="p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-lg transition-colors border border-emerald-200" title="Sign Academic Clearance"><i class="fa-solid fa-file-signature"></i></button>
-                            <button onclick="window.openDeficiencyModal('${data.username}')" class="p-2 bg-orange-50 text-orange-600 hover:bg-orange-500 hover:text-white rounded-lg transition-colors border border-orange-200" title="Flag Academic Issue"><i class="fa-solid fa-triangle-exclamation"></i></button>
-                        `;
-                    } else if (status === 'Approved') {
-                        academicHtml = `<p class="text-sm text-emerald-600 font-medium">Academically Cleared</p><p class="text-xs text-gray-500">Ready for final verification</p>`;
-                        badgeHtml = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 border border-emerald-200"><i class="fa-solid fa-circle-check"></i> Dean Signed</span>`;
-                        actionHtml = `<span class="text-xs text-gray-400 italic mr-2">Processed</span><button class="p-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition-colors border border-gray-200" title="View Records"><i class="fa-solid fa-folder-open"></i></button>`;
-                    } else {
-                        // Hold
-                        const remarkText = data.deanRemark || 'Academic Hold';
-                        academicHtml = `<p class="text-sm font-medium text-orange-600">Action Needed</p><p class="text-xs font-bold text-orange-700">${remarkText}</p>`;
-                        badgeHtml = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700 border border-orange-200"><i class="fa-solid fa-circle-xmark"></i> Hold (Academic)</span>`;
-                        actionHtml = `
-                            <button onclick="window.approve('${data.username}')" class="p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-lg transition-colors border border-emerald-200" title="Clear Status & Sign"><i class="fa-solid fa-check"></i></button>
-                            <button class="p-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition-colors border border-gray-200" title="View Records"><i class="fa-solid fa-folder-open"></i></button>
-                        `;
-                    }
-
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-gray-50 transition-colors animate-fade-in";
-                    tr.innerHTML = `
-                        <td class="p-4 font-medium text-gray-900">${data.username}</td>
-                        <td class="p-4">
-                            <p class="font-bold text-gray-800">${data.name || data.username}</p>
-                            <p class="text-xs text-gray-400">Requested: ${reqDate}</p>
-                        </td>
-                        <td class="p-4">${academicHtml}</td>
-                        <td class="p-4">${badgeHtml}</td>
-                        <td class="p-4 text-right space-x-2 whitespace-nowrap">${actionHtml}</td>
-                    `;
-                    tbody.appendChild(tr);
+                    globalRequestsData.push(data);
                 });
-            }, (err) => {
-                console.error(err);
-                document.getElementById('student-table-body').innerHTML = `<tr><td colspan="5" class="p-4 text-red-500 text-center">Connection error. Check console.</td></tr>`;
+
+                document.getElementById('stat-total').innerText = tot;
+                document.getElementById('stat-pending').innerText = pen;
+                document.getElementById('stat-hold').innerText = hol;
+                document.getElementById('stat-cleared').innerText = cle;
+
+                renderTable();
+                renderGraduatingTable(); // Automatically update the 4th Year list too
             });
         });
 
-        // --- Actions ---
-        window.approve = async (studentId) => {
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'clearances', studentId);
-                await updateDoc(docRef, { dean: 'Approved' });
-                window.showToast(`Academic clearance signed for ${studentId}.`, 'success');
-            } catch (e) {
-                console.error("Approval failed:", e);
-                window.showToast("Failed to approve student.", "error");
-            }
-        };
-
-        // --- Academic Hold Modal Logic ---
-        let currentFlaggingStudentId = null;
-
-        window.openDeficiencyModal = (studentId) => {
-            currentFlaggingStudentId = studentId;
-            document.getElementById('modal-student-id').textContent = studentId;
-            document.getElementById('deficiency-remark').value = 'Incomplete (INC) Grade'; // Default
-            document.getElementById('deficiency-course').value = ''; 
-            document.getElementById('deficiency-modal').classList.remove('hidden');
-        };
-
-        window.closeDeficiencyModal = () => {
-            document.getElementById('deficiency-modal').classList.add('hidden');
-            currentFlaggingStudentId = null;
-        };
-
-        window.submitDeficiency = async () => {
-            const remarkInput = document.getElementById('deficiency-remark');
-            const courseInput = document.getElementById('deficiency-course');
+        function renderTable() {
+            const tbody = document.getElementById('student-table-body');
+            const searchQ = document.getElementById('search-input').value.toLowerCase();
+            const courseQ = document.getElementById('course-filter').value;
             
-            const typeValue = remarkInput.value.trim();
-            const courseValue = courseInput.value.trim();
-            const studentId = currentFlaggingStudentId;
+            let filtered = globalRequestsData.filter(d => {
+                const matchSearch = d.username.toLowerCase().includes(searchQ) || (d.name||'').toLowerCase().includes(searchQ);
+                const matchCourse = courseQ === 'All' || (d.course||'').includes(courseQ) || (d.details||'').includes(courseQ);
+                return matchSearch && matchCourse;
+            });
 
-            let fullRemark = typeValue;
-            if (courseValue) {
-                fullRemark += ` - ${courseValue}`;
+            tbody.innerHTML = "";
+            if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-400">No requests found.</td></tr>`; return; }
+
+            filtered.sort((a, b) => b.timestamp - a.timestamp).forEach(data => {
+                const status = data.dean || 'Pending';
+                let html, badge, actions;
+
+                if (status === 'Pending') {
+                    html = `<p class="text-sm font-medium text-gray-600">Pending Grades</p>`;
+                    badge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">Pending</span>`;
+                    actions = `<button onclick="window.approve('${data.username}')" class="p-2 bg-emerald-50 text-emerald-600 rounded-lg mx-1"><i class="fa-solid fa-check"></i></button><button onclick="window.openDeficiencyModal('${data.username}')" class="p-2 bg-orange-50 text-orange-600 rounded-lg mx-1"><i class="fa-solid fa-flag"></i></button>`;
+                } else if (status === 'Approved') {
+                    html = `<p class="text-sm text-emerald-600 font-medium">Academically Clear</p>`;
+                    badge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">Cleared</span>`;
+                    actions = `<span class="text-xs text-gray-400 italic">Signed</span>`;
+                } else {
+                    html = `<p class="text-sm font-medium text-orange-600">Hold</p><p class="text-xs text-orange-700">${data.deanRemark||'Academic Issue'}</p>`;
+                    badge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700">Hold</span>`;
+                    actions = `<button onclick="window.approve('${data.username}')" class="p-2 bg-emerald-50 text-emerald-600 rounded-lg mx-1"><i class="fa-solid fa-check"></i></button>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-4 font-medium">${data.username}</td>
+                        <td class="p-4"><p class="font-bold">${data.name||data.username}</p><p class="text-xs text-gray-400">${data.details||''}</p></td>
+                        <td class="p-4">${html}</td>
+                        <td class="p-4">${badge}</td>
+                        <td class="p-4 text-right">${actions}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // New function specifically for filtering 4th Years
+        function renderGraduatingTable() {
+            const tbody = document.getElementById('graduating-table-body');
+            
+            // Strictly filter for Year Level = "4"
+            let graduatingStudents = globalRequestsData.filter(d => d.yearLevel === "4");
+
+            tbody.innerHTML = "";
+            if (graduatingStudents.length === 0) { 
+                tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-gray-400">No 4th year students have initiated clearance.</td></tr>`; 
+                return; 
             }
 
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'clearances', studentId);
-                await updateDoc(docRef, { 
-                    dean: 'Hold',
-                    deanRemark: fullRemark
-                });
-                window.showToast(`Academic hold recorded for ${studentId}.`, 'warning');
-                window.closeDeficiencyModal();
-            } catch (e) {
-                console.error("Flagging failed:", e);
-                window.showToast("Failed to flag student.", "error");
-            }
+            graduatingStudents.forEach(data => {
+                const status = data.dean || 'Pending';
+                let badge = "";
+                if (status === 'Approved') badge = `<span class="text-emerald-600 font-bold"><i class="fa-solid fa-check-circle"></i> Cleared</span>`;
+                else if (status === 'Pending') badge = `<span class="text-yellow-600"><i class="fa-solid fa-clock"></i> In Progress</span>`;
+                else badge = `<span class="text-orange-600"><i class="fa-solid fa-circle-xmark"></i> Flagged</span>`;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-4 font-medium text-gray-800">${data.username}</td>
+                        <td class="p-4 font-bold text-gray-900">${data.name || data.username}</td>
+                        <td class="p-4 text-gray-600">${data.details || 'N/A'}</td>
+                        <td class="p-4">${badge}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        document.getElementById('search-input').addEventListener('input', renderTable);
+        document.getElementById('course-filter').addEventListener('change', renderTable);
+
+        window.approve = async (id) => { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clearances', id), { dean: 'Approved' }); window.showToast("Approved."); };
+        let currentFlagId = null;
+        window.openDeficiencyModal = (id) => { currentFlagId = id; document.getElementById('modal-student-id').textContent = id; document.getElementById('deficiency-modal').classList.remove('hidden'); };
+        window.closeDeficiencyModal = () => { document.getElementById('deficiency-modal').classList.add('hidden'); };
+        window.submitDeficiency = async () => {
+            const rem = document.getElementById('deficiency-remark').value;
+            if(!rem) return window.showToast("Select remark", "error");
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clearances', currentFlagId), { dean: 'Hold', deanRemark: rem });
+            window.showToast("Hold recorded.", "warning"); window.closeDeficiencyModal();
         };
-
         window.logout = () => { localStorage.clear(); window.location.href = 'login.html'; };
     </script>
 </body>
