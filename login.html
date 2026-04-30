@@ -35,20 +35,19 @@
         
         /* Custom Scrollbar for Form */
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4 sm:p-8">
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
 
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
 
-    <!-- Main Container: Smoother edges (rounded-[2.5rem]) and natural height to prevent cutoff -->
-    <div class="max-w-5xl w-full bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row my-auto">
+    <div class="max-w-5xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[600px] max-h-[90vh]">
         
         <!-- Left Side: Branding / Info -->
-        <div class="md:w-5/12 bg-gradient-to-br from-chmsu-green to-[#084223] text-white p-10 flex flex-col justify-between relative overflow-hidden bg-pattern min-h-[300px]">
+        <div class="md:w-5/12 bg-gradient-to-br from-chmsu-green to-[#084223] text-white p-10 flex flex-col justify-between relative overflow-hidden bg-pattern">
             <div class="absolute -top-24 -left-24 w-64 h-64 bg-white opacity-5 rounded-full"></div>
             <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-chmsu-gold opacity-10 rounded-full"></div>
             
@@ -63,7 +62,7 @@
                     </div>
                 </div>
 
-                <div class="mt-8 space-y-6">
+                <div class="mt-12 space-y-6">
                     <h2 class="text-3xl font-bold leading-tight">Streamlined Student Clearance</h2>
                     <p class="text-green-100 text-sm leading-relaxed">
                         Experience a hassle-free, automated way to process your university clearances. Secure, fast, and entirely online.
@@ -83,29 +82,29 @@
         </div>
 
         <!-- Right Side: Forms -->
-        <div class="md:w-7/12 p-8 md:p-12 relative flex items-center justify-center bg-white min-h-[600px]">
+        <div class="md:w-7/12 p-8 md:p-12 relative flex items-center justify-center bg-white overflow-hidden">
             
-            <a href="https://wendel2460.github.io/SwiftClear-Docs/" target="_blank" class="absolute top-6 right-6 text-xs sm:text-sm text-gray-500 hover:text-chmsu-green font-medium flex items-center gap-2 transition-colors bg-gray-50 hover:bg-green-50 px-4 py-2 rounded-full border border-gray-200 shadow-sm z-20">
+            <a href="https://wendel2460.github.io/SwiftClear-Docs/" target="_blank" class="absolute top-6 right-6 text-xs sm:text-sm text-gray-500 hover:text-chmsu-green font-medium flex items-center gap-2 transition-colors bg-gray-50 hover:bg-green-50 px-3 py-1.5 rounded-full border border-gray-200 shadow-sm z-20">
                 <i class="fa-solid fa-book-open"></i> <span class="hidden sm:inline">Documentation</span>
             </a>
 
-            <div class="w-full max-w-md relative flex flex-col justify-center">
+            <div class="w-full max-w-md relative flex flex-col h-full justify-center">
                 
                 <!-- ================= LOGIN FORM ================= -->
-                <div id="login-form" class="form-transition show-form w-full">
+                <div id="login-form" class="form-transition show-form">
                     <div class="text-center mb-8">
-                        <h2 class="text-3xl font-bold text-gray-800">Welcome Back</h2>
+                        <h2 class="text-2xl font-bold text-gray-800">Welcome Back</h2>
                         <p class="text-sm text-gray-500 mt-2">Sign in to access your clearance dashboard</p>
                     </div>
 
                     <form onsubmit="handleLogin(event)" class="space-y-5">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Student ID / Office ID or Email</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Student ID / Username</label>
                             <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <i class="fa-regular fa-user text-gray-400"></i>
                                 </div>
-                                <input type="text" id="login-identifier" required class="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all" placeholder="e.g. 12345678, lib, or email">
+                                <input type="text" id="login-username" required class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all" placeholder="e.g. 2024-XXXXX or reg">
                             </div>
                         </div>
 
@@ -115,216 +114,197 @@
                                 <button type="button" onclick="toggleForms('forgot')" class="text-xs font-semibold text-chmsu-green hover:text-[#084223]">Forgot password?</button>
                             </div>
                             <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <i class="fa-solid fa-lock text-gray-400"></i>
                                 </div>
-                                <input type="password" id="login-password" required class="w-full pl-11 pr-10 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all" placeholder="••••••••">
-                                <button type="button" onclick="togglePassword('login-password', this)" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none">
+                                <input type="password" id="login-password" required class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all" placeholder="••••••••">
+                                <button type="button" onclick="togglePassword('login-password', this)" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
                                     <i class="fa-regular fa-eye"></i>
                                 </button>
                             </div>
                         </div>
 
-                        <button id="login-btn" type="submit" class="w-full bg-chmsu-green hover:bg-[#084223] text-white font-bold py-3.5 rounded-2xl transition-all shadow-lg mt-2">
-                            Sign In
-                        </button>
-                        
-                        <div class="relative flex py-3 items-center">
-                            <div class="flex-grow border-t border-gray-200"></div>
-                            <span class="flex-shrink-0 mx-4 text-gray-400 text-xs font-medium uppercase">Or</span>
-                            <div class="flex-grow border-t border-gray-200"></div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="remember" class="w-4 h-4 text-chmsu-green border-gray-300 rounded focus:ring-chmsu-green">
+                            <label for="remember" class="ml-2 block text-sm text-gray-600">Remember me for 30 days</label>
                         </div>
 
-                        <!-- Google Login Button -->
-                        <button type="button" onclick="handleGoogleSignIn()" class="w-full bg-white border border-gray-300 text-gray-700 font-bold py-3 rounded-2xl hover:bg-gray-50 transition-all flex justify-center items-center gap-3">
-                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="w-5 h-5"> Sign in with Google
+                        <button id="login-btn" type="submit" class="w-full bg-chmsu-green hover:bg-[#084223] text-white font-bold py-3 rounded-xl transition-all transform hover:-translate-y-0.5 shadow-lg shadow-green-900/20">
+                            Sign In
                         </button>
                     </form>
 
                     <p class="mt-8 text-center text-sm text-gray-600">
                         Don't have an account? 
-                        <button type="button" onclick="toggleForms('signup')" class="font-bold text-chmsu-green hover:underline focus:outline-none">Register Here</button>
+                        <button type="button" onclick="toggleForms('signup')" class="font-bold text-chmsu-green hover:underline">Register Here</button>
                     </p>
                 </div>
 
                 <!-- ================= SIGN UP FORM ================= -->
-                <div id="signup-form" class="form-transition hide-form flex flex-col w-full absolute top-1/2 left-0 right-0 transform -translate-y-1/2">
-                    <div class="text-center mb-6 flex-shrink-0">
-                        <h2 class="text-3xl font-bold text-gray-800">Create Account</h2>
+                <div id="signup-form" class="form-transition hide-form flex flex-col h-full">
+                    <div class="text-center mb-4 flex-shrink-0">
+                        <h2 class="text-2xl font-bold text-gray-800">Create Account</h2>
                         <p class="text-sm text-gray-500 mt-1">Register to start your clearance process</p>
                     </div>
 
-                    <!-- Scrollable Form Area with softer custom scrollbar -->
-                    <div class="overflow-y-auto custom-scrollbar pr-2 max-h-[60vh]">
-                        <form onsubmit="handleSignup(event)" class="space-y-4 pb-2 px-1">
-                            
-                            <!-- Name Block -->
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-700 mb-1">First Name</label>
-                                    <input type="text" id="signup-first" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="Juan">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-700 mb-1">Middle Name</label>
-                                    <input type="text" id="signup-middle" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="Santos">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-700 mb-1">Last Name</label>
-                                    <input type="text" id="signup-last" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="Dela Cruz">
-                                </div>
-                            </div>
-
-                            <!-- ID & Contact -->
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-700 mb-1">Student ID</label>
-                                    <input type="text" id="signup-id" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="12345678">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-700 mb-1">Contact Number</label>
-                                    <input type="tel" id="signup-contact" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="09XX XXX XXXX">
-                                </div>
-                            </div>
-
-                            <!-- Course / Program Dropdown -->
+                    <!-- Scrollable Form Area -->
+                    <form onsubmit="handleSignup(event)" class="space-y-4 overflow-y-auto custom-scrollbar pr-2 pb-2" style="max-height: 55vh;">
+                        
+                        <!-- Name Block -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Course / Program</label>
-                                <select id="signup-course" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm bg-white">
-                                    <option value="" disabled selected>Select your program...</option>
-                                    <optgroup label="Arts, Science & Public Admin">
-                                        <option value="BAEL">Bachelor of Arts in English Language</option>
-                                        <option value="BASS">Bachelor of Arts in Social Science</option>
-                                        <option value="BPA">Bachelor of Public Administration</option>
-                                        <option value="BSAM">Bachelor of Science in Applied Mathematics</option>
-                                        <option value="BSP">Bachelor of Science in Psychology</option>
-                                    </optgroup>
-                                    <optgroup label="Business & Management">
-                                        <option value="BSHM">Bachelor of Science in Hospitality Management</option>
-                                        <option value="BSOA">Bachelor of Science in Office Administration</option>
-                                        <option value="BSIS">Bachelor of Science in Information Systems</option>
-                                    </optgroup>
-                                    <optgroup label="Education">
-                                        <option value="BECEd">Bachelor of Early Childhood Education</option>
-                                        <option value="BEEd">Bachelor of Elementary Education</option>
-                                        <option value="BPEd">Bachelor of Physical Education</option>
-                                        <option value="BSNEd">Bachelor of Special Needs Education</option>
-                                    </optgroup>
-                                    <optgroup label="Secondary Education">
-                                        <option value="BSEd-English">BSEd - Major in English</option>
-                                        <option value="BSEd-Filipino">BSEd - Major in Filipino</option>
-                                        <option value="BSEd-Math">BSEd - Major in Mathematics</option>
-                                        <option value="BSEd-Science">BSEd - Major in Science</option>
-                                    </optgroup>
-                                    <optgroup label="Tech & Livelihood Education">
-                                        <option value="BTLEd-HE">BTLEd - Home Economics</option>
-                                        <option value="BTLEd-IA">BTLEd - Industrial Arts</option>
-                                    </optgroup>
-                                    <optgroup label="Engineering & Technology">
-                                        <option value="BSCE">Bachelor of Science in Civil Engineering</option>
-                                        <option value="BIT-ArchDrafting">BIT - Architectural Drafting</option>
-                                        <option value="BIT-Automotive">BIT - Automotive Technology</option>
-                                        <option value="BIT-Electrical">BIT - Electrical Technology</option>
-                                        <option value="BIT-Electronics">BIT - Electronics Technology</option>
-                                        <option value="BIT-Apparel">BIT - Apparel & Fashion Tech</option>
-                                        <option value="BIT-Culinary">BIT - Culinary Technology</option>
-                                        <option value="BIT-Mechanical">BIT - Mechanical Technology</option>
-                                        <option value="BIT-HVACR">BIT - HVACR</option>
-                                    </optgroup>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">First Name</label>
+                                <input type="text" id="signup-first" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="Juan">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Middle Name</label>
+                                <input type="text" id="signup-middle" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="Santos">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Last Name</label>
+                                <input type="text" id="signup-last" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="Dela Cruz">
+                            </div>
+                        </div>
+
+                        <!-- ID & Contact -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Student ID</label>
+                                <input type="text" id="signup-id" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="2024-XXXXX">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Contact Number</label>
+                                <input type="tel" id="signup-contact" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="09XX XXX XXXX">
+                            </div>
+                        </div>
+
+                        <!-- Course / Program Dropdown -->
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Course / Program</label>
+                            <select id="signup-course" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm bg-white">
+                                <option value="" disabled selected>Select your program...</option>
+                                <optgroup label="Arts, Science & Public Admin">
+                                    <option value="BAEL">Bachelor of Arts in English Language</option>
+                                    <option value="BASS">Bachelor of Arts in Social Science</option>
+                                    <option value="BPA">Bachelor of Public Administration</option>
+                                    <option value="BSAM">Bachelor of Science in Applied Mathematics</option>
+                                    <option value="BSP">Bachelor of Science in Psychology</option>
+                                </optgroup>
+                                <optgroup label="Business & Management">
+                                    <option value="BSHM">Bachelor of Science in Hospitality Management</option>
+                                    <option value="BSOA">Bachelor of Science in Office Administration</option>
+                                    <option value="BSIS">Bachelor of Science in Information Systems</option>
+                                </optgroup>
+                                <optgroup label="Education">
+                                    <option value="BECEd">Bachelor of Early Childhood Education</option>
+                                    <option value="BEEd">Bachelor of Elementary Education</option>
+                                    <option value="BPEd">Bachelor of Physical Education</option>
+                                    <option value="BSNEd">Bachelor of Special Needs Education</option>
+                                </optgroup>
+                                <optgroup label="Secondary Education">
+                                    <option value="BSEd-English">BSEd - Major in English</option>
+                                    <option value="BSEd-Filipino">BSEd - Major in Filipino</option>
+                                    <option value="BSEd-Math">BSEd - Major in Mathematics</option>
+                                    <option value="BSEd-Science">BSEd - Major in Science</option>
+                                </optgroup>
+                                <optgroup label="Tech & Livelihood Education">
+                                    <option value="BTLEd-HE">BTLEd - Home Economics</option>
+                                    <option value="BTLEd-IA">BTLEd - Industrial Arts</option>
+                                </optgroup>
+                                <optgroup label="Engineering & Technology">
+                                    <option value="BSCE">Bachelor of Science in Civil Engineering</option>
+                                    <option value="BIT-ArchDrafting">BIT - Architectural Drafting</option>
+                                    <option value="BIT-Automotive">BIT - Automotive Technology</option>
+                                    <option value="BIT-Electrical">BIT - Electrical Technology</option>
+                                    <option value="BIT-Electronics">BIT - Electronics Technology</option>
+                                    <option value="BIT-Apparel">BIT - Apparel & Fashion Tech</option>
+                                    <option value="BIT-Culinary">BIT - Culinary Technology</option>
+                                    <option value="BIT-Mechanical">BIT - Mechanical Technology</option>
+                                    <option value="BIT-HVACR">BIT - HVACR</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <!-- Year & Section Dropdowns -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Year Level</label>
+                                <select id="signup-year" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm bg-white">
+                                    <option value="" disabled selected>Select Year</option>
+                                    <option value="1">1st Year</option>
+                                    <option value="2">2nd Year</option>
+                                    <option value="3">3rd Year</option>
+                                    <option value="4">4th Year</option>
                                 </select>
                             </div>
-
-                            <!-- Year & Section Dropdowns -->
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-700 mb-1">Year Level</label>
-                                    <select id="signup-year" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm bg-white">
-                                        <option value="" disabled selected>Select Year</option>
-                                        <option value="1">1st Year</option>
-                                        <option value="2">2nd Year</option>
-                                        <option value="3">3rd Year</option>
-                                        <option value="4">4th Year</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-700 mb-1">Section</label>
-                                    <select id="signup-section" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm bg-white">
-                                        <option value="" disabled selected>Select Section</option>
-                                        <option value="A">A</option>
-                                        <option value="B">B</option>
-                                        <option value="C">C</option>
-                                        <option value="D">D</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <!-- Email -->
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Email Address</label>
-                                <input type="email" id="signup-email" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="student@chmsu.edu.ph">
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Section</label>
+                                <select id="signup-section" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm bg-white">
+                                    <option value="" disabled selected>Select Section</option>
+                                    <option value="A">A</option>
+                                    <option value="B">B</option>
+                                    <option value="C">C</option>
+                                    <option value="D">D</option>
+                                </select>
                             </div>
+                        </div>
 
-                            <!-- Passwords -->
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-700 mb-1">Password</label>
-                                    <input type="password" id="signup-password" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="••••••••">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-700 mb-1">Confirm</label>
-                                    <input type="password" id="signup-confirm" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="••••••••">
-                                </div>
+                        <!-- Email -->
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Email Address</label>
+                            <input type="email" id="signup-email" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="student@chmsu.edu.ph">
+                        </div>
+
+                        <!-- Passwords -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Password</label>
+                                <input type="password" id="signup-password" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="••••••••">
                             </div>
-
-                            <button id="signup-btn" type="submit" class="w-full bg-chmsu-green hover:bg-[#084223] text-white font-bold py-3.5 rounded-2xl transition-all shadow-lg mt-4 flex justify-center items-center gap-2">
-                                Create Account
-                            </button>
-                            
-                            <div class="relative flex py-2 items-center">
-                                <div class="flex-grow border-t border-gray-200"></div>
-                                <span class="flex-shrink-0 mx-4 text-gray-400 text-xs font-medium uppercase">Or</span>
-                                <div class="flex-grow border-t border-gray-200"></div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Confirm</label>
+                                <input type="password" id="signup-confirm" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="••••••••">
                             </div>
+                        </div>
 
-                            <!-- Google Signup Button -->
-                            <button type="button" onclick="handleGoogleSignIn()" class="w-full bg-white border border-gray-300 text-gray-700 font-bold py-3 rounded-2xl hover:bg-gray-50 transition-all flex justify-center items-center gap-3">
-                                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="w-5 h-5"> Sign up with Google
-                            </button>
-                        </form>
-                    </div>
+                        <button id="signup-btn" type="submit" class="w-full bg-chmsu-green hover:bg-[#084223] text-white font-bold py-3 rounded-xl transition-all shadow-lg mt-4 flex justify-center items-center gap-2">
+                            Create Account
+                        </button>
+                    </form>
 
                     <p class="mt-4 flex-shrink-0 text-center text-sm text-gray-600">
                         Already have an account? 
-                        <button type="button" onclick="toggleForms('login')" class="font-bold text-chmsu-green hover:underline focus:outline-none">Sign In</button>
+                        <button type="button" onclick="toggleForms('login')" class="font-bold text-chmsu-green hover:underline">Sign In</button>
                     </p>
                 </div>
 
                 <!-- ================= FORGOT PASSWORD FORM ================= -->
-                <div id="forgot-form" class="form-transition hide-form w-full absolute top-1/2 left-0 right-0 transform -translate-y-1/2">
-                    <button type="button" onclick="toggleForms('login')" class="absolute -top-12 left-0 text-gray-400 hover:text-chmsu-green transition-colors flex items-center gap-1 text-sm font-medium focus:outline-none">
+                <div id="forgot-form" class="form-transition hide-form">
+                    <button type="button" onclick="toggleForms('login')" class="absolute -top-6 -left-2 text-gray-400 hover:text-chmsu-green transition-colors flex items-center gap-1 text-sm font-medium">
                         <i class="fa-solid fa-arrow-left"></i> Back to login
                     </button>
                     
-                    <div class="text-center mb-8 mt-2">
-                        <div class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+                    <div class="text-center mb-8 mt-4">
+                        <div class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
                             <i class="fa-solid fa-key text-2xl text-chmsu-green"></i>
                         </div>
-                        <h2 class="text-3xl font-bold text-gray-800">Account Recovery</h2>
-                        <p class="text-sm text-gray-500 mt-3 px-4">Enter your registered email address to instantly recover your demo password.</p>
+                        <h2 class="text-2xl font-bold text-gray-800">Account Recovery</h2>
+                        <p class="text-sm text-gray-500 mt-2">Enter your registered email address. Since this is a demo environment, your password will be retrieved immediately.</p>
                     </div>
 
-                    <form onsubmit="handleForgotPassword(event)" class="space-y-6">
+                    <form onsubmit="handleForgotPassword(event)" class="space-y-5">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Registered Email Address</label>
                             <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <i class="fa-regular fa-envelope text-gray-400"></i>
                                 </div>
-                                <input type="email" id="forgot-email" required class="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all" placeholder="student@chmsu.edu.ph">
+                                <input type="email" id="forgot-email" required class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all" placeholder="student@chmsu.edu.ph">
                             </div>
                         </div>
 
-                        <button id="forgot-btn" type="submit" class="w-full bg-chmsu-green hover:bg-[#084223] text-white font-bold py-3.5 rounded-2xl transition-all transform hover:-translate-y-0.5 shadow-lg shadow-green-900/20">
-                            Find Password
+                        <button id="forgot-btn" type="submit" class="w-full bg-chmsu-green hover:bg-[#084223] text-white font-bold py-3 rounded-xl transition-all transform hover:-translate-y-0.5 shadow-lg shadow-green-900/20">
+                            Recover Password
                         </button>
                     </form>
                 </div>
@@ -336,8 +316,9 @@
     <!-- JavaScript Logic with Firebase Integration -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        // ADDED getDocs & collection to allow searching through accounts for password recovery
+        import { getFirestore, doc, setDoc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Setup Firebase
         const userFirebaseConfig = {
@@ -356,31 +337,36 @@
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'swiftclear-6195d';
 
-        // --- HARDCODED ADMIN LOGINS (No email required for these 5 offices) ---
-        const ADMIN_ACCOUNTS = {
-            'reg': { role: 'Registrar', name: 'Registrar Admin', redirect: 'registrar_dashboard.html' },
-            'lib': { role: 'Library', name: 'Chief Librarian', redirect: 'library_dashboard.html' },
-            'bus': { role: 'Business Office', name: 'Accounting Officer', redirect: 'business_dashboard.html' },
-            'osas': { role: 'OSAS', name: 'OSAS Coordinator', redirect: 'osas_dashboard.html' },
-            'cict_dean': { role: 'College Dean', name: 'Dean of CICT', redirect: 'dean_dashboard.html' }
+        // Connect anonymously so we can read/write data securely
+        const initAuth = async () => {
+            try {
+                await signInAnonymously(auth);
+            } catch (err) {
+                console.error("Firebase connection error:", err);
+            }
         };
+        initAuth();
 
-        // --- Core Authentication Functions attached to Window ---
 
         window.handleSignup = async (e) => {
             e.preventDefault();
             
+            // Gather all new detailed fields
             const fName = document.getElementById('signup-first').value.trim();
             const mName = document.getElementById('signup-middle').value.trim();
             const lName = document.getElementById('signup-last').value.trim();
+            
             const studentId = document.getElementById('signup-id').value.trim();
             const contact = document.getElementById('signup-contact').value.trim();
             const email = document.getElementById('signup-email').value.trim();
+            
             const course = document.getElementById('signup-course').value;
             const year = document.getElementById('signup-year').value;
             const section = document.getElementById('signup-section').value;
+            
             const password = document.getElementById('signup-password').value;
             const confirm = document.getElementById('signup-confirm').value;
+            
             const btn = document.getElementById('signup-btn');
 
             if (password !== confirm) {
@@ -388,19 +374,21 @@
                 return;
             }
 
-            if (ADMIN_ACCOUNTS[studentId]) {
+            if (mockUsers[studentId]) {
                 window.showToast("This ID is reserved for system admins.", "error");
                 return;
             }
 
+            // Construct merged data strings
             const fullName = `${fName} ${mName} ${lName}`.replace(/\s+/g, ' ').trim();
-            const courseDetails = `${course} ${year}-${section}`; 
+            const courseDetails = `${course} ${year}-${section}`; // Example: BSIS 2-B
 
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
             btn.disabled = true;
 
             try {
-                // Check if username/studentId already exists in DB
+                if (!auth.currentUser) await signInAnonymously(auth);
+
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', studentId);
                 const docSnap = await getDoc(docRef);
 
@@ -411,54 +399,38 @@
                     return;
                 }
 
-                // Register User securely in Firebase Auth
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-
-                // Save details to LIVE FIREBASE DATABASE
-                const userData = {
-                    username: studentId,
-                    email: email,
-                    password: password, // Saved strictly for the Demo Recovery feature
+                // Save merged details to LIVE FIREBASE DATABASE
+                await setDoc(docRef, {
+                    username: studentId, // Saved explicitly for recovery lookups
+                    password: password, 
                     role: 'Student',
                     name: fullName,
                     firstName: fName,
                     middleName: mName,
                     lastName: lName,
                     contact: contact,
+                    email: email,
                     course: course,
                     yearLevel: year,
                     section: section,
                     details: courseDetails, 
                     redirect: 'student_dashboard.html',
                     createdAt: Date.now()
-                };
+                });
 
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid), userData);
+                window.showToast("Account created successfully! Please sign in.", "success");
+                e.target.reset();
                 
-                // Also save by studentId to allow easy ID lookups later
-                await setDoc(docRef, userData);
-
-                // FIX: Immediately log them in! No email verification required.
-                localStorage.setItem('sc_user', JSON.stringify({ 
-                    username: studentId, 
-                    name: fullName, 
-                    role: 'Student',
-                    details: courseDetails
-                }));
-
-                window.showToast("Account created successfully! Redirecting...", "success");
-                setTimeout(() => window.location.href = 'student_dashboard.html', 1500);
+                setTimeout(() => {
+                    window.toggleForms('login');
+                    document.getElementById('login-username').value = studentId;
+                    btn.innerHTML = 'Create Account';
+                    btn.disabled = false;
+                }, 1500);
 
             } catch (error) {
                 console.error(error);
-                if (error.code === 'auth/email-already-in-use') {
-                    window.showToast("An account with this email already exists.", "error");
-                } else if (error.code === 'auth/weak-password') {
-                    window.showToast("Password is too weak. Please use at least 6 characters.", "error");
-                } else {
-                    window.showToast("Registration Error. Please try again later.", "error");
-                }
+                window.showToast("Error creating account. Please check your connection.", "error");
                 btn.innerHTML = 'Create Account';
                 btn.disabled = false;
             }
@@ -466,196 +438,113 @@
 
         window.handleLogin = async (e) => {
             e.preventDefault();
-            const identifier = document.getElementById('login-identifier').value.trim();
+            const username = document.getElementById('login-username').value.trim();
             const password = document.getElementById('login-password').value;
             const btn = document.getElementById('login-btn');
 
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
             btn.disabled = true;
 
-            // 1. ADMIN BYPASS: Instantly login offices without needing an email address
-            if (ADMIN_ACCOUNTS[identifier] && password === 'pass123') {
-                const adminData = ADMIN_ACCOUNTS[identifier];
-                localStorage.setItem('sc_user', JSON.stringify({ 
-                    username: identifier, 
-                    name: adminData.name, 
-                    role: adminData.role,
-                    details: adminData.role
-                }));
-                window.showToast(`Welcome, ${adminData.name}!`, 'success');
-                setTimeout(() => window.location.href = adminData.redirect, 1000);
-                return;
-            } else if (ADMIN_ACCOUNTS[identifier]) {
-                window.showToast("Invalid admin password.", "error");
-                btn.innerHTML = 'Sign In'; btn.disabled = false;
-                return;
+            // 1. Check Hardcoded Admin/Demo Users first
+            if (mockUsers[username]) {
+                const user = mockUsers[username];
+                if (user.password === password) {
+                    localStorage.setItem('sc_user', JSON.stringify({ 
+                        username: username, 
+                        name: user.name, 
+                        role: user.role,
+                        details: user.details || user.role 
+                    }));
+                    window.showToast(`Welcome, ${user.name}! Redirecting...`, 'success');
+                    setTimeout(() => { window.location.href = user.redirect; }, 1000);
+                    return;
+                } else {
+                    window.showToast("Invalid admin password.", "error");
+                    btn.innerHTML = 'Sign In';
+                    btn.disabled = false;
+                    return;
+                }
             }
 
-            // 2. REGULAR STUDENT LOGIN
+            // 2. Check LIVE FIREBASE DATABASE for Registered Students
             try {
-                let emailToLogin = identifier;
+                if (!auth.currentUser) await signInAnonymously(auth);
 
-                // If user entered a Student ID (no @ symbol), look up their email in Firestore
-                if (!identifier.includes('@')) {
-                    const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
-                    const q = query(usersRef, where('username', '==', identifier));
-                    const qSnap = await getDocs(q);
-                    
-                    if (qSnap.empty) {
-                        window.showToast("Student ID not found. Please register.", "error");
-                        btn.innerHTML = 'Sign In'; btn.disabled = false; return;
-                    }
-                    emailToLogin = qSnap.docs[0].data().email;
-                }
-
-                // Secure Firebase Login
-                const userCredential = await signInWithEmailAndPassword(auth, emailToLogin, password);
-                const user = userCredential.user;
-
-                // Fetch full data to route them properly
-                let docRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid);
-                let docSnap = await getDoc(docRef);
-                let userData = null;
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', username);
+                const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
-                    userData = docSnap.data();
-                } else {
-                    // LEGACY ACCOUNT FALLBACK: Find old accounts by email and migrate them
-                    const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
-                    const q = query(usersRef, where('email', '==', user.email));
-                    const qSnap = await getDocs(q);
-                    
-                    if (!qSnap.empty) {
-                        userData = qSnap.docs[0].data();
-                        // Automatically migrate the old user to the new secure UID format
-                        await setDoc(docRef, userData);
+                    const userData = docSnap.data();
+                    if (userData.password === password) {
+                        localStorage.setItem('sc_user', JSON.stringify({ 
+                            username: username, 
+                            name: userData.name, 
+                            role: userData.role,
+                            details: userData.details || userData.role
+                        }));
+                        window.showToast(`Welcome, ${userData.name}!`, 'success');
+                        setTimeout(() => { window.location.href = userData.redirect; }, 1000);
+                    } else {
+                        window.showToast("Invalid password.", "error");
+                        btn.innerHTML = 'Sign In';
+                        btn.disabled = false;
                     }
-                }
-
-                if (userData) {
-                    localStorage.setItem('sc_user', JSON.stringify({ 
-                        username: userData.username, 
-                        name: userData.name, 
-                        role: userData.role,
-                        details: userData.details || userData.role
-                    }));
-                    window.showToast(`Welcome, ${userData.name}!`, 'success');
-                    setTimeout(() => { window.location.href = userData.redirect || 'student_dashboard.html'; }, 1000);
                 } else {
-                    window.showToast("Profile data missing. Please contact admin.", "error");
+                    window.showToast("Account not found. Please register.", "error");
+                    btn.innerHTML = 'Sign In';
+                    btn.disabled = false;
                 }
             } catch (error) {
                 console.error(error);
-                if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') {
-                    window.showToast("Invalid credentials or user not found.", "error");
-                } else {
-                    window.showToast("Login failed. Please check your connection.", "error");
-                }
-            } finally {
+                window.showToast("Connection error. Please try again.", "error");
                 btn.innerHTML = 'Sign In';
                 btn.disabled = false;
             }
         };
 
-        window.handleGoogleSignIn = async () => {
-            const provider = new GoogleAuthProvider();
-            try {
-                const result = await signInWithPopup(auth, provider);
-                const user = result.user;
-
-                let docRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid);
-                let docSnap = await getDoc(docRef);
-                let userData = null;
-
-                if (docSnap.exists()) {
-                    userData = docSnap.data();
-                } else {
-                    // LEGACY ACCOUNT FALLBACK FOR GOOGLE: Find old accounts by email and migrate
-                    const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
-                    const q = query(usersRef, where('email', '==', user.email));
-                    const qSnap = await getDocs(q);
-                    
-                    if (!qSnap.empty) {
-                        userData = qSnap.docs[0].data();
-                        // Auto-migrate
-                        await setDoc(docRef, userData);
-                    }
-                }
-
-                if (userData) {
-                    // Existing User - Login directly
-                    localStorage.setItem('sc_user', JSON.stringify({ 
-                        username: userData.username, name: userData.name, role: userData.role, details: userData.details || userData.role
-                    }));
-                    window.showToast(`Welcome back, ${userData.name}!`, 'success');
-                    setTimeout(() => { window.location.href = userData.redirect || 'student_dashboard.html'; }, 1000);
-                } else {
-                    // NEW GOOGLE USER
-                    const newId = "G" + Date.now().toString().slice(-6); // Temporary ID
-                    await setDoc(docRef, {
-                        username: newId,
-                        email: user.email,
-                        role: 'Student',
-                        name: user.displayName,
-                        firstName: user.displayName.split(' ')[0],
-                        details: 'BSIS 1-A (Google)',
-                        redirect: 'student_dashboard.html',
-                        createdAt: Date.now()
-                    });
-                    
-                    // Also save to standard lookup doc
-                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', newId), {
-                        username: newId, email: user.email, role: 'Student', name: user.displayName, details: 'BSIS 1-A (Google)'
-                    });
-
-                    localStorage.setItem('sc_user', JSON.stringify({ username: newId, name: user.displayName, role: 'Student', details: 'BSIS 1-A' }));
-                    window.showToast("Google account linked successfully!", "success");
-                    setTimeout(() => { window.location.href = 'student_dashboard.html'; }, 1000);
-                }
-            } catch(error) {
-                console.error(error);
-                if (error.code === 'auth/unauthorized-domain') {
-                    window.showToast("Google Login Error: Please add this URL to Authorized Domains in Firebase Console.", "error");
-                } else {
-                    window.showToast("Google Sign-In failed or was cancelled.", "error");
-                }
-            }
-        };
-
-        // Instant Password Recovery via Database Search (Bypasses email blocks)
+        // NEW: Database Password Recovery Simulation
         window.handleForgotPassword = async (e) => {
             e.preventDefault();
             const emailInput = document.getElementById('forgot-email').value.trim().toLowerCase();
             const btn = document.getElementById('forgot-btn');
 
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Searching...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Searching Database...';
             btn.disabled = true;
 
             try {
-                // Search the users collection for this email
-                const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
-                const q = query(usersRef, where('email', '==', emailInput));
-                const querySnapshot = await getDocs(q);
+                if (!auth.currentUser) await signInAnonymously(auth);
 
-                if (!querySnapshot.empty) {
-                    const userData = querySnapshot.docs[0].data();
-                    
-                    // Display the password directly to the user
-                    window.showToast(`Found it! Your password is: ${userData.password}`, "info");
+                // Fetch all users to find the matching email
+                const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
+                const snapshot = await getDocs(usersRef);
+                
+                let foundUser = null;
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (data.email && data.email.toLowerCase() === emailInput) {
+                        foundUser = data;
+                    }
+                });
+
+                if (foundUser) {
+                    // Tell the user their password in a toast instead of an email
+                    window.showToast(`Demo Recovery: Your password is "${foundUser.password}"`, "info");
                     
                     setTimeout(() => {
                         window.toggleForms('login');
-                        document.getElementById('login-identifier').value = userData.username;
+                        // Auto-fill their ID to help them log in
+                        document.getElementById('login-username').value = foundUser.username || ''; 
                         e.target.reset();
-                    }, 5000);
+                    }, 4000); // Wait 4 seconds so they can read the password
                 } else {
                     window.showToast("No account found with that email address.", "error");
                 }
+
             } catch (error) {
                 console.error("Recovery Error:", error);
-                window.showToast("Database search failed. Ensure you are connected to the internet.", "error");
+                window.showToast("Error connecting to database.", "error");
             } finally {
-                btn.innerHTML = 'Find Password';
+                btn.innerHTML = 'Recover Password';
                 btn.disabled = false;
             }
         };
@@ -683,13 +572,6 @@
             [login, signup, forgot].forEach(form => {
                 form.classList.remove('show-form');
                 form.classList.add('hide-form');
-                
-                // Reset positions
-                if (target === form.id.replace('-form', '')) {
-                    form.classList.remove('absolute', 'top-1/2', '-translate-y-1/2');
-                } else {
-                    form.classList.add('absolute', 'top-1/2', '-translate-y-1/2');
-                }
             });
 
             if (target === 'login') {
@@ -708,18 +590,20 @@
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             
+            // Allow an "info" type for the password recovery notification
             let bgColor = 'bg-emerald-500';
             let icon = 'fa-check-circle';
             if (type === 'error') { bgColor = 'bg-red-500'; icon = 'fa-circle-exclamation'; }
             if (type === 'info') { bgColor = 'bg-blue-600'; icon = 'fa-circle-info'; }
 
-            toast.className = `${bgColor} text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-y-[-20px] opacity-0 z-50`;
+            toast.className = `${bgColor} text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-y-[-20px] opacity-0`;
             toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span class="font-medium text-sm">${message}</span>`;
             
             container.appendChild(toast);
             setTimeout(() => toast.classList.remove('opacity-0', 'translate-y-[-20px]'), 10);
             
-            const displayTime = type === 'info' ? 7000 : 3000;
+            // Info toasts stay on screen a little longer so they can read the password
+            const displayTime = type === 'info' ? 5000 : 3000;
             setTimeout(() => {
                 toast.classList.add('opacity-0');
                 setTimeout(() => toast.remove(), 300);
