@@ -85,9 +85,9 @@
             <button onclick="switchTab('clearances')" id="nav-clearances" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-xl font-medium transition-colors text-left">
                 <i class="fa-solid fa-clipboard-check w-5 text-center"></i> My Clearances
             </button>
-            <button onclick="switchTab('notifications')" id="nav-notifications" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-xl font-medium transition-colors relative text-left">
+            <button onclick="switchTab('notifications'); clearNotificationBadge();" id="nav-notifications" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-xl font-medium transition-colors relative text-left">
                 <i class="fa-solid fa-bell w-5 text-center"></i> Notifications
-                <span class="absolute right-4 top-3.5 flex h-3 w-3">
+                <span id="notif-badge" class="absolute right-4 top-3.5 flex h-3 w-3 hidden">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
                 </span>
@@ -193,70 +193,79 @@
                                 <div class="w-full bg-gray-700/50 rounded-full h-2.5">
                                     <div id="overall-progress-bar" class="bg-chmsu-gold h-2.5 rounded-full transition-all duration-1000" style="width: 0%"></div>
                                 </div>
-                                <p id="cleared-count-text" class="text-xs text-green-100 mt-2 text-right">0 of 4 departments cleared</p>
+                                <p id="cleared-count-text" class="text-xs text-green-100 mt-2 text-right">0 of 5 departments cleared</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Department Status Grid (DYNAMIC) -->
                     <h3 class="text-lg font-bold text-gray-800 mt-8 mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-building-columns text-chmsu-green"></i> 4-Step Departmental Signatories
+                        <i class="fa-solid fa-building-columns text-chmsu-green"></i> 5-Step Departmental Signatories
                     </h3>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                         <!-- 1. Library -->
-                        <div id="card-library" class="bg-gray-50 rounded-xl border border-gray-200 shadow-sm p-5 relative overflow-hidden opacity-75 transition-all duration-300">
+                        <div id="card-library" class="bg-gray-50 rounded-xl border border-gray-200 shadow-sm p-4 relative overflow-hidden opacity-75 transition-all duration-300">
                             <div id="card-edge-library" class="absolute top-0 left-0 w-1 h-full bg-gray-400"></div>
-                            <div class="flex justify-between items-start mb-4">
-                                <div id="card-icon-bg-library" class="w-10 h-10 rounded-lg bg-gray-200 text-gray-500 flex items-center justify-center">
-                                    <i id="card-icon-library" class="fa-solid fa-lock text-lg"></i>
+                            <div class="flex justify-between items-start mb-3">
+                                <div id="card-icon-bg-library" class="w-8 h-8 rounded-lg bg-gray-200 text-gray-500 flex items-center justify-center">
+                                    <i id="card-icon-library" class="fa-solid fa-lock text-sm"></i>
                                 </div>
-                                <span id="card-badge-library" class="px-2.5 py-1 bg-gray-200 text-gray-600 text-xs font-bold rounded-full">Locked</span>
+                                <span id="card-badge-library" class="px-2 py-0.5 bg-gray-200 text-gray-600 text-[10px] font-bold rounded-full">Locked</span>
                             </div>
-                            <h4 class="font-bold text-gray-800 mb-1">Library Services</h4>
-                            <p id="card-desc-library" class="text-xs text-gray-500 mb-4 h-8">Awaiting clearance initiation.</p>
+                            <h4 class="font-bold text-gray-800 text-sm mb-1">Library</h4>
                             <div id="card-action-library" class="text-xs text-gray-400 flex items-center gap-1 h-6"></div>
                         </div>
 
-                        <!-- 2. Business Affairs (Finance) -->
-                        <div id="card-business" class="bg-gray-50 rounded-xl border border-gray-200 shadow-sm p-5 relative overflow-hidden opacity-75 transition-all duration-300">
+                        <!-- 2. Business Affairs -->
+                        <div id="card-business" class="bg-gray-50 rounded-xl border border-gray-200 shadow-sm p-4 relative overflow-hidden opacity-75 transition-all duration-300">
                             <div id="card-edge-business" class="absolute top-0 left-0 w-1 h-full bg-gray-400"></div>
-                            <div class="flex justify-between items-start mb-4">
-                                <div id="card-icon-bg-business" class="w-10 h-10 rounded-lg bg-gray-200 text-gray-500 flex items-center justify-center">
-                                    <i id="card-icon-business" class="fa-solid fa-lock text-lg"></i>
+                            <div class="flex justify-between items-start mb-3">
+                                <div id="card-icon-bg-business" class="w-8 h-8 rounded-lg bg-gray-200 text-gray-500 flex items-center justify-center">
+                                    <i id="card-icon-business" class="fa-solid fa-lock text-sm"></i>
                                 </div>
-                                <span id="card-badge-business" class="px-2.5 py-1 bg-gray-200 text-gray-600 text-xs font-bold rounded-full">Locked</span>
+                                <span id="card-badge-business" class="px-2 py-0.5 bg-gray-200 text-gray-600 text-[10px] font-bold rounded-full">Locked</span>
                             </div>
-                            <h4 class="font-bold text-gray-800 mb-1">Business Affairs</h4>
-                            <p id="card-desc-business" class="text-xs text-gray-500 mb-4 h-8">Awaiting clearance initiation.</p>
+                            <h4 class="font-bold text-gray-800 text-sm mb-1">Business</h4>
                             <div id="card-action-business" class="text-xs text-gray-400 flex items-center gap-1 h-6"></div>
                         </div>
 
                         <!-- 3. Registrar -->
-                        <div id="card-registrar" class="bg-gray-50 rounded-xl border border-gray-200 shadow-sm p-5 relative overflow-hidden opacity-75 transition-all duration-300">
+                        <div id="card-registrar" class="bg-gray-50 rounded-xl border border-gray-200 shadow-sm p-4 relative overflow-hidden opacity-75 transition-all duration-300">
                             <div id="card-edge-registrar" class="absolute top-0 left-0 w-1 h-full bg-gray-400"></div>
-                            <div class="flex justify-between items-start mb-4">
-                                <div id="card-icon-bg-registrar" class="w-10 h-10 rounded-lg bg-gray-200 text-gray-500 flex items-center justify-center">
-                                    <i id="card-icon-registrar" class="fa-solid fa-lock text-lg"></i>
+                            <div class="flex justify-between items-start mb-3">
+                                <div id="card-icon-bg-registrar" class="w-8 h-8 rounded-lg bg-gray-200 text-gray-500 flex items-center justify-center">
+                                    <i id="card-icon-registrar" class="fa-solid fa-lock text-sm"></i>
                                 </div>
-                                <span id="card-badge-registrar" class="px-2.5 py-1 bg-gray-200 text-gray-600 text-xs font-bold rounded-full">Locked</span>
+                                <span id="card-badge-registrar" class="px-2 py-0.5 bg-gray-200 text-gray-600 text-[10px] font-bold rounded-full">Locked</span>
                             </div>
-                            <h4 class="font-bold text-gray-800 mb-1">Registrar's Office</h4>
-                            <p id="card-desc-registrar" class="text-xs text-gray-500 mb-4 h-8">Awaiting clearance initiation.</p>
+                            <h4 class="font-bold text-gray-800 text-sm mb-1">Registrar</h4>
                             <div id="card-action-registrar" class="text-xs text-gray-400 flex items-center gap-1 h-6"></div>
                         </div>
 
-                        <!-- 4. College Dean -->
-                        <div id="card-dean" class="bg-gray-50 rounded-xl border border-gray-200 shadow-sm p-5 relative overflow-hidden opacity-75 transition-all duration-300">
-                            <div id="card-edge-dean" class="absolute top-0 left-0 w-1 h-full bg-gray-400"></div>
-                            <div class="flex justify-between items-start mb-4">
-                                <div id="card-icon-bg-dean" class="w-10 h-10 rounded-lg bg-gray-200 text-gray-500 flex items-center justify-center">
-                                    <i id="card-icon-dean" class="fa-solid fa-lock text-lg"></i>
+                        <!-- 4. OSAS -->
+                        <div id="card-osas" class="bg-gray-50 rounded-xl border border-gray-200 shadow-sm p-4 relative overflow-hidden opacity-75 transition-all duration-300">
+                            <div id="card-edge-osas" class="absolute top-0 left-0 w-1 h-full bg-gray-400"></div>
+                            <div class="flex justify-between items-start mb-3">
+                                <div id="card-icon-bg-osas" class="w-8 h-8 rounded-lg bg-gray-200 text-gray-500 flex items-center justify-center">
+                                    <i id="card-icon-osas" class="fa-solid fa-lock text-sm"></i>
                                 </div>
-                                <span id="card-badge-dean" class="px-2.5 py-1 bg-gray-200 text-gray-600 text-xs font-bold rounded-full">Locked</span>
+                                <span id="card-badge-osas" class="px-2 py-0.5 bg-gray-200 text-gray-600 text-[10px] font-bold rounded-full">Locked</span>
                             </div>
-                            <h4 class="font-bold text-gray-800 mb-1">College Dean</h4>
-                            <p id="card-desc-dean" class="text-xs text-gray-500 mb-4 h-8">Awaiting clearance initiation.</p>
+                            <h4 class="font-bold text-gray-800 text-sm mb-1">OSAS</h4>
+                            <div id="card-action-osas" class="text-xs text-gray-400 flex items-center gap-1 h-6"></div>
+                        </div>
+
+                        <!-- 5. College Dean -->
+                        <div id="card-dean" class="bg-gray-50 rounded-xl border border-gray-200 shadow-sm p-4 relative overflow-hidden opacity-75 transition-all duration-300">
+                            <div id="card-edge-dean" class="absolute top-0 left-0 w-1 h-full bg-gray-400"></div>
+                            <div class="flex justify-between items-start mb-3">
+                                <div id="card-icon-bg-dean" class="w-8 h-8 rounded-lg bg-gray-200 text-gray-500 flex items-center justify-center">
+                                    <i id="card-icon-dean" class="fa-solid fa-lock text-sm"></i>
+                                </div>
+                                <span id="card-badge-dean" class="px-2 py-0.5 bg-gray-200 text-gray-600 text-[10px] font-bold rounded-full">Locked</span>
+                            </div>
+                            <h4 class="font-bold text-gray-800 text-sm mb-1">Dean</h4>
                             <div id="card-action-dean" class="text-xs text-gray-400 flex items-center gap-1 h-6"></div>
                         </div>
                     </div>
@@ -352,19 +361,19 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Hidden PDF Template Container -->
-    <div id="pdf-container">
+        <!-- Hidden PDF Template Container -->
+        <div id="pdf-container">
         <div id="clearance-pdf" style="width: 800px; padding: 40px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: white; color: #000;">
             
             <!-- PDF Header -->
-            <div style="text-align: center; border-bottom: 2px solid #0C5E33; padding-bottom: 20px; margin-bottom: 30px;">
+            <div style="text-align: center; border-bottom: 2px solid #0C5E33; padding-bottom: 20px; margin-bottom: 30px; position: relative;">
                 <h1 style="color: #0C5E33; font-size: 24px; margin: 0; text-transform: uppercase;">Carlos Hilado Memorial State University</h1>
                 <p style="margin: 5px 0 0; font-size: 12px; color: #555;">SwiftClear Digital Clearance System</p>
                 <h2 style="margin: 25px 0 0; font-size: 20px; letter-spacing: 1px;">OFFICIAL STUDENT CLEARANCE</h2>
+                <div style="position: absolute; right: 0; top: 0; text-align: right;">
+                    <div style="font-size: 10px; color: #888;">Control No:</div>
+                    <div id="pdf-control-no" style="font-size: 14px; font-weight: bold; color: #b91c1c;">CTRL-XXXXXXXX</div>
+                </div>
             </div>
             
             <!-- Student Details -->
@@ -415,6 +424,11 @@
                     </tr>
                     <tr>
                         <td style="border: 1px solid #000; padding: 12px; font-weight: bold;">Registrar's Office</td>
+                        <td style="border: 1px solid #000; padding: 12px; text-align: center; color: #0C5E33; font-weight: bold;">CLEARED</td>
+                        <td style="border: 1px solid #000; padding: 12px; text-align: center; color: #0C5E33; font-style: italic;">Verified & E-Signed via SwiftClear</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #000; padding: 12px; font-weight: bold;">Office for Student Affairs (OSAS)</td>
                         <td style="border: 1px solid #000; padding: 12px; text-align: center; color: #0C5E33; font-weight: bold;">CLEARED</td>
                         <td style="border: 1px solid #000; padding: 12px; text-align: center; color: #0C5E33; font-style: italic;">Verified & E-Signed via SwiftClear</td>
                     </tr>
@@ -520,6 +534,11 @@
             document.getElementById('header-title').innerText = titles[tabId];
 
             if(window.innerWidth < 1024) window.toggleSidebar();
+        };
+
+        window.clearNotificationBadge = () => {
+            const badge = document.getElementById('notif-badge');
+            if (badge) badge.classList.add('hidden');
         };
 
         window.toggleSidebar = () => {
@@ -687,7 +706,7 @@
                             <div>
                                 <h4 class="font-bold text-gray-800">${d.name} Approved</h4>
                                 <p class="text-sm text-gray-600">Your clearance has been successfully verified and signed by ${d.name}.</p>
-                                <p class="text-xs text-gray-400 mt-2"><i class="fa-regular fa-clock"></i> Recently Updated</p>
+                                <p class="text-xs text-gray-400 mt-2"><i class="fa-regular fa-clock"></i> Timestamp Active</p>
                             </div>
                         </div>
                     `;
@@ -702,7 +721,7 @@
                                 <div class="mt-2 bg-red-50 p-3 rounded-lg text-sm text-red-700 border border-red-100">
                                     <strong>Remark:</strong> ${d.remark || 'Please visit the department to resolve.'}
                                 </div>
-                                <p class="text-xs text-gray-400 mt-2"><i class="fa-regular fa-clock"></i> Recently Updated</p>
+                                <p class="text-xs text-gray-400 mt-2"><i class="fa-regular fa-clock"></i> Timestamp Active</p>
                             </div>
                         </div>
                     `;
@@ -727,13 +746,16 @@
             // 1. Populate the hidden PDF template with real data
             const uData = globalUserData || {};
             
-            // Format Names properly (Last Name, First Name, Middle Name)
             const lastName = uData.lastName || "";
             const firstName = uData.firstName || "";
             const middleName = uData.middleName || "";
             let formattedName = `${lastName}, ${firstName}`;
             if (middleName) formattedName += ` ${middleName}`;
             if (!lastName && !firstName) formattedName = studentName; // Fallback
+
+            // Generate Control Number
+            const controlStr = `CTRL-${studentId}-${Date.now().toString().slice(-6)}`;
+            document.getElementById('pdf-control-no').innerText = controlStr;
 
             document.getElementById('pdf-id').innerText = studentId;
             document.getElementById('pdf-name').innerText = formattedName;
@@ -800,6 +822,10 @@
                     renderNotifications(globalClearanceData);
                     renderHistory();
 
+                    // If unread notifications exist, show the badge
+                    const badge = document.getElementById('notif-badge');
+                    if (badge) badge.classList.remove('hidden');
+
                     document.getElementById('banner-status').innerHTML = 'Clearance Status: <span class="text-chmsu-gold">In Progress</span>';
                     if (initContainer) initContainer.classList.add('hidden');
                     if (progressContainer) progressContainer.classList.remove('hidden');
@@ -807,16 +833,18 @@
                     updateCardUI('library', globalClearanceData.library || 'Pending', globalClearanceData.libraryRemark);
                     updateCardUI('business', globalClearanceData.business || globalClearanceData.finance || 'Pending', globalClearanceData.businessRemark); 
                     updateCardUI('registrar', globalClearanceData.registrar || 'Pending', globalClearanceData.registrarRemark);
+                    updateCardUI('osas', globalClearanceData.osas || 'Pending', globalClearanceData.osasRemark);
                     updateCardUI('dean', globalClearanceData.dean || 'Pending', globalClearanceData.deanRemark);
 
-                    // Calculate Completion
+                    // Calculate Completion (Now out of 5)
                     let clearedCount = 0;
                     if (globalClearanceData.library === 'Approved') clearedCount++;
                     if (globalClearanceData.business === 'Approved' || globalClearanceData.finance === 'Approved') clearedCount++;
                     if (globalClearanceData.registrar === 'Approved') clearedCount++;
+                    if (globalClearanceData.osas === 'Approved') clearedCount++;
                     if (globalClearanceData.dean === 'Approved') clearedCount++;
 
-                    const progressPct = Math.round((clearedCount / 4) * 100);
+                    const progressPct = Math.round((clearedCount / 5) * 100);
                     
                     const progressText = document.getElementById('overall-progress-text');
                     const progressBar = document.getElementById('overall-progress-bar');
@@ -824,7 +852,7 @@
 
                     if (progressText) progressText.innerText = progressPct + '%';
                     if (progressBar) progressBar.style.width = progressPct + '%';
-                    if (countText) countText.innerText = `${clearedCount} of 4 departments cleared`;
+                    if (countText) countText.innerText = `${clearedCount} of 5 departments cleared`;
 
                     const certBtn = document.getElementById('generate-pdf-btn');
                     if(progressPct === 100) {
@@ -924,6 +952,7 @@
                     library: 'Pending',
                     business: 'Pending',
                     registrar: 'Pending',
+                    osas: 'Pending',
                     dean: 'Pending',
                     timestamp: Date.now()
                 });
