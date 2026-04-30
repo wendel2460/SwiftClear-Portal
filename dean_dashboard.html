@@ -210,20 +210,12 @@
             if (!user) return;
             const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'clearances');
             
-            onSnapshot(colRef, async (snapshot) => {
-                const usersSnap = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', 'users'));
-                const usersMap = {};
-                usersSnap.forEach(u => usersMap[u.id] = u.data());
-
+            onSnapshot(colRef, (snapshot) => {
                 let tot=0, pen=0, hol=0, cle=0;
                 globalRequestsData = [];
                 
                 snapshot.forEach(docSnap => {
                     let data = docSnap.data();
-                    let uData = usersMap[data.username] || {};
-                    data.course = uData.course || '';
-                    data.details = uData.details || '';
-                    data.yearLevel = String(uData.yearLevel || ''); // Store year level for Graduating Filter
                     tot++;
                     
                     const status = data.dean || 'Pending';
@@ -241,6 +233,9 @@
 
                 renderTable();
                 renderGraduatingTable(); // Automatically update the 4th Year list too
+            }, (err) => {
+                console.error(err);
+                document.getElementById('student-table-body').innerHTML = `<tr><td colspan="5" class="p-4 text-red-500 text-center">Connection error. Check console.</td></tr>`;
             });
         });
 
