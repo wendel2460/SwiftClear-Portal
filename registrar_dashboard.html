@@ -109,23 +109,8 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" onclick="switchTab('records')" id="nav-records" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
-                        <i class="fa-solid fa-folder-tree w-5 text-center"></i> Student Records
-                    </a>
-                </li>
-                <li>
-                    <a href="#" onclick="switchTab('documents')" id="nav-documents" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
-                        <i class="fa-solid fa-file-contract w-5 text-center"></i> Document Tracking
-                    </a>
-                </li>
-                <li>
                     <a href="#" onclick="switchTab('queue')" id="nav-queue" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
                         <i class="fa-solid fa-users-viewfinder w-5 text-center"></i> Clearance Queue
-                    </a>
-                </li>
-                <li>
-                    <a href="#" onclick="switchTab('settings')" id="nav-settings" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-colors mt-4">
-                        <i class="fa-solid fa-gear w-5 text-center"></i> Settings
                     </a>
                 </li>
             </ul>
@@ -226,10 +211,21 @@
                             <span class="px-3 py-1 bg-chmsu-green text-white text-[10px] font-bold rounded-full animate-pulse">LIVE SYNC ON</span>
                         </div>
                         
-                        <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                            <button onclick="startNewBatch()" class="px-4 py-2 bg-chmsu-gold text-chmsu-dark font-bold rounded-lg text-sm hover:bg-yellow-400 shadow-sm flex items-center gap-2">
+                                <i class="fa-solid fa-rotate-right"></i> Reset Semester
+                            </button>
+                            <select id="course-filter" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-chmsu-green bg-white">
+                                <option value="All">All Courses</option>
+                                <option value="BSIS">BSIS</option>
+                                <option value="BSIT">BSIT</option>
+                                <option value="BSCE">BSCE</option>
+                                <option value="BSEd">BSEd</option>
+                                <option value="BSHM">BSHM</option>
+                            </select>
                             <div class="relative w-full sm:w-64">
                                 <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                <input type="text" placeholder="Search ID or Name..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none">
+                                <input type="text" id="search-input" placeholder="Search ID or Name..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none">
                             </div>
                         </div>
                     </div>
@@ -261,27 +257,9 @@
             </div> <!-- End of VIEW: DASHBOARD -->
 
             <!-- Placeholder Views for other Tabs -->
-            <div id="view-records" class="hidden h-full flex flex-col items-center justify-center text-center p-8 mt-12 animate-[fadeIn_0.3s_ease-in-out]">
-                <div class="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 mb-4 mx-auto"><i class="fa-solid fa-folder-tree text-4xl"></i></div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-2">Student Records Directory</h2>
-                <button onclick="switchTab('dashboard')" class="mt-6 px-5 py-2.5 bg-chmsu-green text-white rounded-lg text-sm font-medium">Return to Overview</button>
-            </div>
-            
-            <div id="view-documents" class="hidden h-full flex flex-col items-center justify-center text-center p-8 mt-12 animate-[fadeIn_0.3s_ease-in-out]">
-                <div class="w-24 h-24 bg-orange-50 rounded-full flex items-center justify-center text-orange-500 mb-4 mx-auto"><i class="fa-solid fa-file-contract text-4xl"></i></div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-2">Document Tracking</h2>
-                <button onclick="switchTab('dashboard')" class="mt-6 px-5 py-2.5 bg-chmsu-green text-white rounded-lg text-sm font-medium">Return to Overview</button>
-            </div>
-            
             <div id="view-queue" class="hidden h-full flex flex-col items-center justify-center text-center p-8 mt-12 animate-[fadeIn_0.3s_ease-in-out]">
                 <div class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 mb-4 mx-auto"><i class="fa-solid fa-users-viewfinder text-4xl"></i></div>
                 <h2 class="text-2xl font-bold text-gray-800 mb-2">Full Clearance Queue</h2>
-                <button onclick="switchTab('dashboard')" class="mt-6 px-5 py-2.5 bg-chmsu-green text-white rounded-lg text-sm font-medium">Return to Overview</button>
-            </div>
-
-            <div id="view-settings" class="hidden h-full flex flex-col items-center justify-center text-center p-8 mt-12 animate-[fadeIn_0.3s_ease-in-out]">
-                <div class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 mb-4 mx-auto"><i class="fa-solid fa-gear text-4xl"></i></div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-2">Registrar Settings</h2>
                 <button onclick="switchTab('dashboard')" class="mt-6 px-5 py-2.5 bg-chmsu-green text-white rounded-lg text-sm font-medium">Return to Overview</button>
             </div>
 
@@ -293,7 +271,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Setup Firebase
         const userFirebaseConfig = {
@@ -346,8 +324,8 @@
         };
 
         window.switchTab = (tabId) => {
-            const titles = { 'dashboard': 'Registrar Clearance Overview', 'records': 'Student Records', 'documents': 'Document Tracking', 'queue': 'Clearance Queue', 'settings': 'Registrar Settings' };
-            const views = ['dashboard', 'records', 'documents', 'queue', 'settings'];
+            const titles = { 'dashboard': 'Registrar Clearance Overview', 'queue': 'Clearance Queue' };
+            const views = ['dashboard', 'queue'];
             
             views.forEach(view => {
                 document.getElementById(`view-${view}`).classList.add('hidden');
@@ -371,16 +349,17 @@
         };
         initAuth();
 
+        let globalRequestsData = [];
+
         onAuthStateChanged(auth, (user) => {
             if (!user) return;
 
             const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'clearances');
             
             onSnapshot(colRef, (snapshot) => {
-                const tbody = document.getElementById('student-table-body');
                 let totalCount = 0, pendingCount = 0, holdCount = 0, clearedCount = 0;
-                
-                const requests = [];
+                globalRequestsData = [];
+
                 snapshot.forEach(docSnap => {
                     const data = docSnap.data();
                     totalCount++;
@@ -390,7 +369,7 @@
                     else if (regStatus === 'Approved') clearedCount++;
                     else holdCount++; // Hold or Action Needed
                     
-                    requests.push(data);
+                    globalRequestsData.push(data);
                 });
 
                 // Update Stat Cards
@@ -399,61 +378,99 @@
                 document.getElementById('stat-hold').innerText = holdCount;
                 document.getElementById('stat-cleared').innerText = clearedCount;
 
-                tbody.innerHTML = "";
-                
-                if (requests.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-12 text-center text-gray-400"><i class="fa-solid fa-inbox text-5xl mb-4 opacity-20"></i><p>No clearance requests found.</p></td></tr>`;
-                    return;
-                }
-
-                // Sort newest first
-                requests.sort((a, b) => b.timestamp - a.timestamp).forEach(data => {
-                    const status = data.registrar || 'Pending';
-                    const reqDate = new Date(data.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-                    
-                    let regHtml, badgeHtml, actionHtml;
-
-                    if (status === 'Pending') {
-                        regHtml = `<p class="text-sm font-medium text-gray-600"><i class="fa-solid fa-clock text-xs"></i> Awaiting Verification</p><p class="text-xs text-gray-500">Checking document completeness...</p>`;
-                        badgeHtml = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700 border border-yellow-200"><i class="fa-solid fa-clock"></i> Pending Review</span>`;
-                        actionHtml = `
-                            <button onclick="window.approve('${data.username}')" class="p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-lg transition-colors border border-emerald-200" title="Approve Clearance"><i class="fa-solid fa-check"></i></button>
-                            <button onclick="window.openDeficiencyModal('${data.username}')" class="p-2 bg-red-50 text-red-600 hover:bg-red-500 hover:text-white rounded-lg transition-colors border border-red-200" title="Report Missing Document"><i class="fa-solid fa-folder-minus"></i></button>
-                        `;
-                    } else if (status === 'Approved') {
-                        regHtml = `<p class="text-sm text-emerald-600 font-medium">Records Verified</p><p class="text-xs text-gray-500">All documents are complete</p>`;
-                        badgeHtml = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 border border-emerald-200"><i class="fa-solid fa-circle-check"></i> Cleared</span>`;
-                        actionHtml = `<span class="text-xs text-gray-400 italic mr-2">Processed</span><button class="p-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition-colors border border-gray-200" title="View Records"><i class="fa-solid fa-folder-open"></i></button>`;
-                    } else {
-                        // Hold
-                        const remarkText = data.registrarRemark || 'Missing Document';
-                        regHtml = `<p class="text-sm font-medium text-red-600">Document Hold</p><p class="text-xs font-bold text-red-700">${remarkText}</p>`;
-                        badgeHtml = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700 border border-red-200"><i class="fa-solid fa-circle-xmark"></i> Hold (Registrar)</span>`;
-                        actionHtml = `
-                            <button onclick="window.approve('${data.username}')" class="p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-lg transition-colors border border-emerald-200" title="Clear Hold & Approve"><i class="fa-solid fa-check"></i></button>
-                            <button class="p-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition-colors border border-gray-200" title="View Records"><i class="fa-solid fa-folder-open"></i></button>
-                        `;
-                    }
-
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-gray-50 transition-colors animate-fade-in";
-                    tr.innerHTML = `
-                        <td class="p-4 font-medium text-gray-900">${data.username}</td>
-                        <td class="p-4">
-                            <p class="font-bold text-gray-800">${data.name || data.username}</p>
-                            <p class="text-xs text-gray-400">Requested: ${reqDate}</p>
-                        </td>
-                        <td class="p-4">${regHtml}</td>
-                        <td class="p-4">${badgeHtml}</td>
-                        <td class="p-4 text-right space-x-2 whitespace-nowrap">${actionHtml}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
+                renderTable();
             }, (err) => {
                 console.error(err);
                 document.getElementById('student-table-body').innerHTML = `<tr><td colspan="5" class="p-4 text-red-500 text-center">Connection error. Check console.</td></tr>`;
             });
         });
+
+        function renderTable() {
+            const tbody = document.getElementById('student-table-body');
+            const searchQ = document.getElementById('search-input').value.toLowerCase();
+            const courseQ = document.getElementById('course-filter').value;
+            
+            let filtered = globalRequestsData.filter(d => {
+                const matchSearch = d.username.toLowerCase().includes(searchQ) || (d.name||'').toLowerCase().includes(searchQ);
+                const matchCourse = courseQ === 'All' || (d.course||'').includes(courseQ) || (d.details||'').includes(courseQ);
+                return matchSearch && matchCourse;
+            });
+
+            tbody.innerHTML = "";
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-12 text-center text-gray-400"><i class="fa-solid fa-inbox text-5xl mb-4 opacity-20"></i><p>No clearance requests found matching criteria.</p></td></tr>`;
+                return;
+            }
+
+            // Sort newest first
+            filtered.sort((a, b) => b.timestamp - a.timestamp).forEach(data => {
+                const status = data.registrar || 'Pending';
+                const reqDate = new Date(data.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                
+                let regHtml, badgeHtml, actionHtml;
+
+                if (status === 'Pending') {
+                    regHtml = `<p class="text-sm font-medium text-gray-600"><i class="fa-solid fa-clock text-xs"></i> Awaiting Verification</p><p class="text-xs text-gray-500">Checking document completeness...</p>`;
+                    badgeHtml = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700 border border-yellow-200"><i class="fa-solid fa-clock"></i> Pending Review</span>`;
+                    actionHtml = `
+                        <button onclick="window.approve('${data.username}')" class="p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-lg transition-colors border border-emerald-200" title="Approve Clearance"><i class="fa-solid fa-check"></i></button>
+                        <button onclick="window.openDeficiencyModal('${data.username}')" class="p-2 bg-red-50 text-red-600 hover:bg-red-500 hover:text-white rounded-lg transition-colors border border-red-200" title="Report Missing Document"><i class="fa-solid fa-folder-minus"></i></button>
+                    `;
+                } else if (status === 'Approved') {
+                    regHtml = `<p class="text-sm text-emerald-600 font-medium">Records Verified</p><p class="text-xs text-gray-500">All documents are complete</p>`;
+                    badgeHtml = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 border border-emerald-200"><i class="fa-solid fa-circle-check"></i> Cleared</span>`;
+                    actionHtml = `<span class="text-xs text-gray-400 italic mr-2">Processed</span>`;
+                } else {
+                    // Hold
+                    const remarkText = data.registrarRemark || 'Missing Document';
+                    regHtml = `<p class="text-sm font-medium text-red-600">Document Hold</p><p class="text-xs font-bold text-red-700">${remarkText}</p>`;
+                    badgeHtml = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700 border border-red-200"><i class="fa-solid fa-circle-xmark"></i> Hold (Registrar)</span>`;
+                    actionHtml = `
+                        <button onclick="window.approve('${data.username}')" class="p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-lg transition-colors border border-emerald-200" title="Clear Hold & Approve"><i class="fa-solid fa-check"></i></button>
+                    `;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50 transition-colors animate-fade-in";
+                tr.innerHTML = `
+                    <td class="p-4 font-medium text-gray-900">${data.username}</td>
+                    <td class="p-4">
+                        <p class="font-bold text-gray-800">${data.name || data.username}</p>
+                        <p class="text-xs text-gray-400">Course: ${data.details || 'N/A'}</p>
+                    </td>
+                    <td class="p-4">${regHtml}</td>
+                    <td class="p-4">${badgeHtml}</td>
+                    <td class="p-4 text-right space-x-2 whitespace-nowrap">${actionHtml}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Attach listeners for filter/search
+        document.getElementById('search-input').addEventListener('input', renderTable);
+        document.getElementById('course-filter').addEventListener('change', renderTable);
+
+        // --- Master Reset Button Logic ---
+        window.startNewBatch = async () => {
+            if(!confirm("Are you sure you want to archive current clearances and start a new semester? This will reset all students' progress.")) return;
+            
+            try {
+                window.showToast("Archiving clearances... Please wait.", "info");
+                const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'clearances');
+                const snapshot = await getDocs(colRef);
+                
+                // Reset active clearances forcing students to re-initiate
+                for (const document of snapshot.docs) {
+                     await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clearances', document.id));
+                }
+                
+                window.showToast("New semester started! Clearances reset.", "success");
+            } catch (err) {
+                console.error("Archive Error:", err);
+                window.showToast("Failed to start new batch.", "error");
+            }
+        };
 
         // --- Actions ---
         window.approve = async (studentId) => {
