@@ -301,29 +301,7 @@
                         <button id="forgot-btn" type="submit" class="w-full bg-chmsu-green hover:bg-[#084223] text-white font-bold py-3.5 rounded-2xl transition-all transform hover:-translate-y-0.5 shadow-lg shadow-green-900/20">
                             Send Reset Link
                         </button>
-                    </form>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        const userFirebaseConfig = {
-            apiKey: "AIzaSyB5kxApyrtCUXLMiTO4g-kNXZgpWkf1jlg",
-            authDomain: "swiftclear-6195d.firebaseapp.com",
-            projectId: "swiftclear-6195d",
-            storageBucket: "swiftclear-6195d.firebasestorage.app",
-            messagingSenderId: "386476383105",
-            appId: "1:386476383105:web:2d706ae20c19b2a633e680",
-            measurementId: "G-K4FRYKDS8P"
-        };
-
-        // Official Firebase Password Reset Email
+        // Official Firebase Password Reset Email (With Hybrid Fallback)
         window.handleForgotPassword = async (e) => {
             e.preventDefault();
             const emailInput = document.getElementById('forgot-email').value.trim().toLowerCase();
@@ -333,6 +311,7 @@
             btn.disabled = true;
 
             try {
+                // 1. Try to send the official Firebase Reset Email
                 await sendPasswordResetEmail(auth, emailInput);
                 window.showToast("Reset link sent! Please check your inbox and SPAM folder.", "success");
                 
@@ -340,13 +319,36 @@
                     window.toggleForms('login');
                     e.target.reset();
                 }, 4000);
+                
             } catch (error) {
                 console.error("Recovery Error:", error);
-                if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-email') {
-                    window.showToast("No account found with that email address.", "error");
-                } else {
-                    window.showToast("Failed to send link. Ensure you are connected to the internet.", "error");
+                
+                // 2. HYBRID FALLBACK: If Firebase blocks the email (limits, local testing, etc), instantly grab it from the DB
+                try {
+                    const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
+                    const q = query(usersRef, where('email', '==', emailInput));
+                    const querySnapshot = await getDocs(q);
+
+                    if (!querySnapshot.empty) {
+                        const userData = querySnapshot.docs[0].data();
+                        
+                        // Show the password in a blue info toast
+                        window.showToast(`Email delayed. Backup Recovery: Your password is "${userData.password}"`, "info");
+                        
+                        setTimeout(() => {
+                            window.toggleForms('login');
+                            document.getElementById('login-identifier').value = userData.username;
+                            e.target.reset();
+                        }, 6000); // Wait 6 seconds so they can read the password
+                        
+                    } else {
+                        // If the email truly doesn't exist, show the EXACT Firebase error
+                        window.showToast("Firebase Error: " + error.message, "error");
+                    }
+                } catch (fallbackError) {
+                    window.showToast("Firebase Error: " + error.message, "error");
                 }
+                
             } finally {
                 btn.innerHTML = 'Send Reset Link';
                 btn.disabled = false;
