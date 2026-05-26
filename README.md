@@ -2,8 +2,8 @@
 
 > Automated Web-Based Student Clearance System for CHMSU
 
-![SwiftClear Banner](https://img.shields.io/badge/SwiftClear-Student%20Clearance-green?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
+![SwiftClear](https://img.shields.io/badge/SwiftClear-Student%20Clearance-green?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Live-success?style=for-the-badge)
 ![Built With](https://img.shields.io/badge/Built%20With-HTML%20%7C%20Tailwind%20%7C%20Firebase-blue?style=for-the-badge)
 
 ---
@@ -12,62 +12,85 @@
 
 SwiftClear is an **Automated Web-Based Student Clearance System** developed for **Carlos Hilado Memorial State University (CHMSU)**.
 
-The system modernizes and digitalizes the traditional paper-based clearance process by integrating multiple university offices into one centralized online platform.
+The system digitalizes and streamlines the traditional student clearance process by integrating multiple university offices into one secure web platform.
 
-SwiftClear enables students and offices to process, track, and approve clearances in real time through a secure and streamlined workflow.
+SwiftClear enables students and clearing offices to:
+
+- Submit clearance requests
+- Monitor status in real time
+- Evaluate and approve requests
+- Receive deficiency notifications
+- Generate downloadable electronic clearances
 
 ---
 
-# 🎯 Objectives
+# 🌐 Live Project Links
 
-The system aims to:
+## 🚀 Live Web Application
 
-- Digitize manual clearance procedures
+SwiftClear System:
+
+https://swift-clear.web.app/
+
+## 📚 System Documentation
+
+Technical Documentation and Research Portal:
+
+https://swiftcleardocumentation.web.app/
+
+---
+
+# 🎯 Project Objectives
+
+SwiftClear aims to:
+
+- Digitize manual clearance workflows
 - Reduce processing delays
-- Improve inter-department coordination
-- Provide real-time clearance monitoring
-- Minimize paperwork and physical transactions
-- Generate secure electronic clearances
+- Improve department coordination
+- Provide real-time status tracking
+- Reduce paperwork
+- Secure institutional records
+- Generate electronic clearances
 
 ---
 
-# ✨ Key Features
+# ✨ Core Features
 
 ## Student Portal
+✅ Login & Authentication  
 ✅ Clearance Request Submission  
-✅ Clearance Status Tracking  
-✅ Notification System  
-✅ Clearance History  
-✅ Student Profile Management  
+✅ Live Clearance Tracking  
+✅ Notifications  
+✅ History Logs  
+✅ Student Profile  
 ✅ Downloadable E-Clearance PDF  
 
-## Office Portals
+## Administrative Offices
 
 ### Registrar
-- Document Verification
-- Final Clearance Validation
-- Academic Record Checking
+- Final Clearance Approval
+- Student Record Validation
+- Completion Verification
 
 ### Business Office
-- Financial Verification
-- Tuition and Balance Clearance
+- Financial Assessment
+- Outstanding Balance Checking
 
 ### Library
-- Book Return Monitoring
-- Fine Verification
+- Book Return Validation
+- Fine Monitoring
 
 ### Dean's Office
 - Academic Clearance
-- Graduation Validation
-- Academic Hold Management
+- Graduation Verification
 
 ### OSAS
-- Student Affairs Verification
-- Conduct and Requirement Clearance
+- Student Affairs Clearance
+- Conduct Verification
 
 ---
 
-# 🔄 System Workflow
+# 🔄 Clearance Workflow
 
 SwiftClear follows a workflow-driven approval process:
 
@@ -80,7 +103,7 @@ Business Office
     ↓
 Library
     ↓
-Dean's Office
+Dean
     ↓
 OSAS
     ↓
@@ -89,34 +112,84 @@ Registrar
 Final E-Clearance Release
 ```
 
-This workflow ensures transparency, accountability, and faster processing.
-
 ---
 
 # 🏗 System Architecture
 
-SwiftClear uses a **multi-role web architecture** where:
+SwiftClear implements a **multi-role web architecture**.
 
-- Students submit and monitor requests
-- Offices review and approve/deny requests
-- Clearance status updates instantly
-- Final clearance is generated electronically
+### User Roles
+
+- Student
+- Registrar
+- Business Office
+- Library
+- Dean
+- OSAS
+
+Each role accesses a dedicated dashboard with role-based permissions.
+
+---
+
+# 🔐 Demo Credentials
+
+⚠ **Demo Accounts Only**  
+These credentials are intended for evaluation and testing purposes only.
+
+## Student Demo
+
+```text
+Email: carlos@chmsu.edu.ph
+Password: pass123
+```
+
+## Office Demo Accounts
+
+### Library
+```text
+User: lib
+Password: pass123
+```
+
+### Business Office
+```text
+User: bus
+Password: pass123
+```
+
+### Registrar
+```text
+User: reg
+Password: pass123
+```
+
+### OSAS
+```text
+User: osas
+Password: pass123
+```
+
+### Dean
+```text
+User: cict_dean
+Password: pass123
+```
 
 ---
 
 # 💻 Technology Stack
 
-SwiftClear is built using:
+SwiftClear is developed using:
 
 | Technology | Purpose |
 |------------|---------|
 | HTML5 | Structure |
-| Tailwind CSS | User Interface |
-| JavaScript | System Logic |
+| Tailwind CSS | UI Framework |
+| JavaScript | Client Logic |
 | Firebase Authentication | Login Security |
 | Firebase Hosting | Deployment |
+| Firestore | Database |
 | Font Awesome | Icons |
-| Local Storage / Database | Data Handling |
 
 ---
 
@@ -141,35 +214,49 @@ SwiftClear-Portal/
 
 ---
 
-# 🔐 Security Features
+# 🔒 Security Features
 
 SwiftClear includes:
 
 - Role-Based Access Control (RBAC)
-- Login Authentication
-- Protected Dashboards
-- Session Validation
-- Department Access Restriction
+- Authentication Validation
+- Dashboard Route Protection
+- Session Verification
+- Department-Level Restrictions
+- Firebase Security Rules
 
-Only authorized users can access corresponding office dashboards.
+Only authorized users can access assigned dashboards.
+
+---
+
+# 📱 Responsive Design
+
+SwiftClear supports:
+
+- Desktop
+- Laptop
+- Tablet
+- Mobile Devices
+
+Built with responsive Tailwind CSS layouts.
 
 ---
 
 # 🚀 Installation Guide
 
-## 1 Clone Repository
+## Clone Repository
 
 ```bash
 git clone https://github.com/wendel2460/SwiftClear-Portal.git
 ```
 
-## 2 Open Project Directory
+## Open Project
 
 ```bash
 cd SwiftClear-Portal
 ```
 
-## 3 Run Locally
+## Run Locally
 
 Open:
 
@@ -177,11 +264,11 @@ Open:
 index.html
 ```
 
-or use **VS Code Live Server**.
+or use **Live Server**.
 
 ---
 
-# 🌐 Firebase Deployment
+# ☁ Firebase Deployment
 
 Initialize Firebase:
 
@@ -195,47 +282,19 @@ Deploy:
 firebase deploy
 ```
 
-Hosting URL will be generated after deployment.
-
----
-
-# 📱 Responsive Design
-
-SwiftClear is designed to work across:
-
-- Desktop Computers
-- Laptops
-- Tablets
-- Mobile Devices
-
-Using responsive Tailwind CSS layouts.
-
----
-
-# 📷 System Screenshots
-
-## Login Portal
-Coming Soon
-
-## Student Dashboard
-Coming Soon
-
-## Office Dashboards
-Coming Soon
-
 ---
 
 # 🧪 Testing
 
-System testing includes:
+Testing coverage includes:
 
-- Login Authentication Testing
-- Role Access Testing
+- Authentication Testing
+- Dashboard Access Testing
 - Workflow Validation
-- Notification Testing
 - Clearance Approval Testing
+- Notification Testing
 - PDF Generation Testing
-- Responsive UI Testing
+- Responsive Interface Testing
 
 ---
 
@@ -247,10 +306,10 @@ SwiftClear was developed as part of the:
 
 and is supported by studies on:
 
-- Student Clearance Digitalization
-- Workflow-Driven Clearance Systems
-- Web-Based Multi-Department Integration
-- Electronic Clearance Platforms
+- Digital Clearance Systems
+- Workflow-Driven Approval Systems
+- Multi-Department Web Integration
+- Electronic Student Services
 
 ---
 
@@ -270,30 +329,23 @@ The project follows the **Systems Development Life Cycle (SDLC)**:
 
 # 👨‍💻 Developers
 
-**Wendel N. Flores**  
+**Flores, Wendel N.**  
+**Rojas, Earl Ritche T.**  
+**Jabuhat, Al Clent N.**
+
 BS Information Systems  
 Carlos Hilado Memorial State University
 
-With project collaborators, advisers, and testers.
-
 ---
 
-# 📄 Documentation
+# 📄 License
 
-Project documentation and technical references are available in the system documentation repository.
+Academic and Educational Use
 
----
-
-# 📜 License
-
-This project is intended for:
-
-**Academic and Educational Use**
-
-All rights reserved © 2026.
+© 2026 SwiftClear Project Team
 
 ---
 
 # ⭐ SwiftClear
 
-> "Streamlining Student Clearance Through Digital Innovation"
+> “Streamlining Student Clearance Through Digital Innovation”
