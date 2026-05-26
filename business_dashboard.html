@@ -26,7 +26,7 @@
 </head>
 <body class="flex h-screen overflow-hidden">
 
-    <!-- Auth here Guard -->
+    <!-- Auth Guard -->
     <script>
         const checkUser = JSON.parse(localStorage.getItem('sc_user'));
         if (!checkUser || !checkUser.username || checkUser.role !== 'Business Office') { window.location.replace('login.html'); }
