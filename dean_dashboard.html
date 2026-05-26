@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwiftClear - Dean Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='white'/%3E%3Cg transform='scale(-1,1) translate(-64,0)'%3E%3Cpath fill='%230C5E33' d='M32 16L10 25l22 9 18-7.4V38h3V25L32 16zm-12 16v7c0 3.9 5.4 7 12 7s12-3.1 12-7v-7l-12 5-12-5z'/%3E%3C/g%3E%3C/svg%3E">
+    
+    <script>
+        tailwind.config = { theme: { extend: { colors: { chmsu: { green: '#0C5E33', gold: '#FFC72C', dark: '#1F2937' } }, fontFamily: { sans: ['Poppins', 'sans-serif'] } } } }
+    </script>
+    
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f3f4f6; }
+        .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .tab-content { display: none; }
+        .tab-content.block { display: block; animation: slideIn 0.3s ease-out forwards; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: slideIn 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- Auth Guard -->
+    <script>
+        const checkUser = JSON.parse(localStorage.getItem('sc_user'));
+        if (!checkUser || !checkUser.username || checkUser.role !== 'College Dean') { window.location.replace('login.html'); }
+    </script>
+
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
+
+    <!-- Academic Hold Modal -->
+    <div id="deficiency-modal" class="fixed inset-0 bg-black/50 z-[60] hidden flex items-center justify-center backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden transform transition-all">
+            <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation text-orange-500"></i> Record Academic Hold</h3>
+                <button onclick="closeDeficiencyModal()" class="text-gray-400 hover:text-gray-600 transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-gray-600 mb-4">Record an academic deficiency for Student <span id="modal-student-id" class="font-bold text-gray-800"></span>.</p>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Issue Description</label>
+                    <select id="deficiency-remark" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm outline-none">
+                        <option value="Incomplete (INC) Grade">Incomplete (INC) Grade</option>
+                        <option value="Missing Hardbound Thesis">Missing Hardbound Thesis</option>
+                        <option value="Lacking Prerequisite">Lacking Prerequisite Subject</option>
+                        <option value="Other">Other Academic Hold</option>
+                    </select>
+                </div>
+            </div>
+            <div class="p-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50">
+                <button onclick="closeDeficiencyModal()" class="px-4 py-2 text-gray-600 bg-gray-200 rounded-lg text-sm font-medium">Cancel</button>
+                <button onclick="submitDeficiency()" class="px-4 py-2 bg-orange-500 text-white rounded-lg text-sm font-medium shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-flag"></i> Flag Student
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-chmsu-dark text-white flex flex-col flex-shrink-0 transition-transform duration-300 absolute md:relative z-20 h-full -translate-x-full md:translate-x-0" id="sidebar">
+        <div class="h-16 flex items-center px-6 bg-gray-900 border-b border-gray-800">
+            <div class="w-8 h-8 bg-chmsu-green rounded flex items-center justify-center mr-3"><i class="fa-solid fa-graduation-cap text-chmsu-gold text-sm"></i></div>
+            <span class="text-xl font-bold tracking-wider text-chmsu-gold">SwiftClear</span>
+        </div>
+        <div class="p-6 border-b border-gray-800">
+            <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Department</p>
+            <p class="font-semibold text-chmsu-gold flex items-center gap-2"><i class="fa-solid fa-user-tie"></i> Dean's Office</p>
+        </div>
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1 px-3" id="sidebar-nav">
+                <li><button onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-link w-full flex items-center gap-3 px-3 py-2.5 bg-chmsu-green rounded-lg text-white font-medium"><i class="fa-solid fa-chart-line w-5 text-center"></i> Overview</button></li>
+                <li><button onclick="switchTab('graduating')" id="nav-graduating" class="sidebar-link w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors"><i class="fa-solid fa-user-graduate w-5 text-center"></i> Graduating List</button></li>
+                <li><button onclick="switchTab('queue')" id="nav-queue" class="sidebar-link w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors"><i class="fa-solid fa-users-viewfinder w-5 text-center"></i> Clearance Queue</button></li>
+            </ul>
+        </nav>
+        <div class="p-4 border-t border-gray-800">
+            <button onclick="logout()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"><i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i> Sign Out</button>
+        </div>
+    </aside>
+
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-10 hidden md:hidden"></div>
+
+    <main class="flex-1 flex flex-col overflow-hidden bg-gray-50 relative">
+        <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-8 shrink-0">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()" class="md:hidden text-gray-500 hover:text-gray-700"><i class="fa-solid fa-bars text-xl"></i></button>
+                <h1 id="header-title" class="text-xl font-bold text-gray-800">Academic Clearance</h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-right hidden sm:block">
+                    <p id="nav-display-name" class="text-sm font-bold text-gray-800">Loading...</p>
+                    <p class="text-xs text-green-600 font-bold uppercase">Online</p>
+                </div>
+                <img id="nav-avatar" src="" class="w-10 h-10 rounded-full border border-gray-200 shadow-sm bg-gray-100">
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-4 lg:p-8 custom-scrollbar relative">
+            <div id="view-dashboard" class="tab-content block">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 w-full">
+                    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 text-xl"><i class="fa-solid fa-users"></i></div><div><p class="text-sm text-gray-500 font-medium">Enrollees</p><p id="stat-total" class="text-2xl font-bold">0</p></div></div>
+                    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-600 text-xl"><i class="fa-solid fa-file-circle-question"></i></div><div><p class="text-sm text-gray-500 font-medium">Pending Review</p><p id="stat-pending" class="text-2xl font-bold">0</p></div></div>
+                    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center text-orange-500 text-xl"><i class="fa-solid fa-file-circle-xmark"></i></div><div><p class="text-sm text-gray-500 font-medium">Academic Holds</p><p id="stat-hold" class="text-2xl font-bold">0</p></div></div>
+                    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500 text-xl"><i class="fa-solid fa-award"></i></div><div><p class="text-sm text-gray-500 font-medium">Cleared</p><p id="stat-cleared" class="text-2xl font-bold">0</p></div></div>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col w-full">
+                    <div class="p-6 border-b border-gray-200 bg-gray-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <h2 class="text-lg font-bold text-gray-800">Clearance Queue</h2>
+                        <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                            <!-- COURSE FILTER -->
+                            <select id="course-filter" class="px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none">
+                                <option value="All">All Courses</option>
+                                <option value="BSIS">BSIS</option><option value="BSIT">BSIT</option><option value="BSCE">BSCE</option><option value="BSEd">BSEd</option><option value="BSHM">BSHM</option>
+                            </select>
+                            <!-- SEARCH BAR -->
+                            <div class="relative w-full sm:w-64">
+                                <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" id="search-input" placeholder="Search ID or Name..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm outline-none">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left border-collapse min-w-[850px]">
+                            <thead>
+                                <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
+                                    <th class="p-4 border-b w-1/6">Student ID</th><th class="p-4 border-b w-1/4">Name & Course</th><th class="p-4 border-b w-1/4">Academic Record</th><th class="p-4 border-b w-1/6">Status</th><th class="p-4 border-b w-1/6 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-table-body" class="text-sm divide-y divide-gray-100">
+                                <tr><td colspan="5" class="p-12 text-center text-gray-400">Connecting...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRADUATING LIST -->
+            <div id="view-graduating" class="hidden tab-content">
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col w-full">
+                    <div class="p-6 border-b border-gray-200 bg-gray-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-gray-800"><i class="fa-solid fa-user-graduate text-chmsu-green mr-2"></i> 4th Year Graduating Candidates</h2>
+                            <p class="text-xs text-gray-500 mt-1">Filtered specifically for students in Year Level 4.</p>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
+                                    <th class="p-4 border-b">Student ID</th><th class="p-4 border-b">Name</th><th class="p-4 border-b">Course & Section</th><th class="p-4 border-b">Clearance Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="graduating-table-body" class="text-sm divide-y divide-gray-100">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="view-queue" class="hidden tab-content p-8 text-center text-gray-500">
+                <i class="fa-solid fa-users text-4xl mb-4"></i><p>Full Queue View is currently displayed on the main dashboard.</p>
+                <button onclick="switchTab('dashboard')" class="mt-4 px-4 py-2 bg-chmsu-green text-white rounded-lg">Go Back</button>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const userFirebaseConfig = {
+            apiKey: "AIzaSyB5kxApyrtCUXLMiTO4g-kNXZgpWkf1jlg",
+            authDomain: "swiftclear-6195d.firebaseapp.com",
+            projectId: "swiftclear-6195d",
+            storageBucket: "swiftclear-6195d.firebasestorage.app",
+            messagingSenderId: "386476383105",
+            appId: "1:386476383105:web:2d706ae20c19b2a633e680",
+            measurementId: "G-K4FRYKDS8P"
+        };
+        
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : userFirebaseConfig;
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'swiftclear-6195d';
+
+        let sessionUser = { name: 'Dean Admin' };
+        try { const saved = JSON.parse(localStorage.getItem('sc_user')); if(saved) sessionUser = saved; } catch(e) {}
+        document.getElementById('nav-display-name').innerText = sessionUser.name;
+        document.getElementById('nav-avatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(sessionUser.name)}&background=0C5E33&color=fff`;
+
+        window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebar-overlay').classList.toggle('hidden'); };
+        window.switchTab = (tabId) => {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('block'));
+            document.getElementById(`view-${tabId}`).classList.add('block');
+            document.querySelectorAll('.sidebar-link').forEach(el => el.className = 'sidebar-link w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors');
+            document.getElementById(`nav-${tabId}`).className = 'sidebar-link w-full flex items-center gap-3 px-3 py-2.5 bg-chmsu-green rounded-lg text-white font-medium';
+            if(window.innerWidth < 768) window.toggleSidebar();
+        };
+        window.showToast = (msg, type='success') => {
+            const c = document.getElementById('toast-container'); const t = document.createElement('div');
+            t.className = `${type==='success'?'bg-emerald-500':'bg-red-500'} text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 transform opacity-0 translate-y-[-20px] transition-all z-50`;
+            t.innerHTML = `<i class="fa-solid ${type==='success'?'fa-check-circle':'fa-circle-exclamation'}"></i> <span class="font-medium text-sm">${msg}</span>`;
+            c.appendChild(t); setTimeout(() => t.classList.remove('translate-y-[-20px]', 'opacity-0'), 10);
+            setTimeout(() => { t.classList.add('opacity-0'); setTimeout(() => t.remove(), 300); }, 3000);
+        };
+
+        let globalRequestsData = [];
+
+        const initAuth = async () => { try { if (!auth.currentUser) await signInAnonymously(auth); } catch (err) {} };
+        initAuth();
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) return;
+            const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'clearances');
+            
+            onSnapshot(colRef, (snapshot) => {
+                let tot=0, pen=0, hol=0, cle=0;
+                globalRequestsData = [];
+                
+                snapshot.forEach(docSnap => {
+                    let data = docSnap.data();
+                    tot++;
+                    
+                    const status = data.dean || 'Pending';
+                    if (status === 'Pending') pen++;
+                    else if (status === 'Approved') cle++;
+                    else hol++;
+                    
+                    globalRequestsData.push(data);
+                });
+
+                document.getElementById('stat-total').innerText = tot;
+                document.getElementById('stat-pending').innerText = pen;
+                document.getElementById('stat-hold').innerText = hol;
+                document.getElementById('stat-cleared').innerText = cle;
+
+                renderTable();
+                renderGraduatingTable(); // Automatically update the 4th Year list too
+            }, (err) => {
+                console.error(err);
+                document.getElementById('student-table-body').innerHTML = `<tr><td colspan="5" class="p-4 text-red-500 text-center">Connection error. Check console.</td></tr>`;
+            });
+        });
+
+        function renderTable() {
+            const tbody = document.getElementById('student-table-body');
+            const searchQ = document.getElementById('search-input').value.toLowerCase();
+            const courseQ = document.getElementById('course-filter').value;
+            
+            let filtered = globalRequestsData.filter(d => {
+                const matchSearch = (d.username||'').toLowerCase().includes(searchQ) || (d.name||'').toLowerCase().includes(searchQ);
+                const matchCourse = courseQ === 'All' || (d.details||'').includes(courseQ);
+                return matchSearch && matchCourse;
+            });
+
+            tbody.innerHTML = "";
+            if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-400">No requests found.</td></tr>`; return; }
+
+            filtered.sort((a, b) => b.timestamp - a.timestamp).forEach(data => {
+                const status = data.dean || 'Pending';
+                let html, badge, actions;
+
+                if (status === 'Pending') {
+                    html = `<p class="text-sm font-medium text-gray-600">Pending Grades</p>`;
+                    badge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">Pending</span>`;
+                    actions = `<button onclick="window.approve('${data.username}')" class="p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-lg mx-1"><i class="fa-solid fa-check"></i></button><button onclick="window.openDeficiencyModal('${data.username}')" class="p-2 bg-orange-50 text-orange-600 hover:bg-orange-500 hover:text-white rounded-lg mx-1"><i class="fa-solid fa-flag"></i></button>`;
+                } else if (status === 'Approved') {
+                    html = `<p class="text-sm text-emerald-600 font-medium">Academically Clear</p>`;
+                    badge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">Cleared</span>`;
+                    actions = `<span class="text-xs text-gray-400 italic">Signed</span>`;
+                } else {
+                    html = `<p class="text-sm font-medium text-orange-600">Hold</p><p class="text-xs text-orange-700">${data.deanRemark||'Academic Issue'}</p>`;
+                    badge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700">Hold</span>`;
+                    actions = `<button onclick="window.approve('${data.username}')" class="p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-lg mx-1"><i class="fa-solid fa-check"></i></button>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50 animate-fade-in">
+                        <td class="p-4 font-medium">${data.username}</td>
+                        <td class="p-4"><p class="font-bold">${data.name||data.username}</p><p class="text-xs text-gray-400">${data.details||''}</p></td>
+                        <td class="p-4">${html}</td>
+                        <td class="p-4">${badge}</td>
+                        <td class="p-4 text-right">${actions}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderGraduatingTable() {
+            const tbody = document.getElementById('graduating-table-body');
+            if(!tbody) return;
+            
+            // Filter for Year Level = "4" OR " 4-" inside details
+            let graduatingStudents = globalRequestsData.filter(d => d.yearLevel === "4" || String(d.details||'').includes(" 4-"));
+
+            tbody.innerHTML = "";
+            if (graduatingStudents.length === 0) { 
+                tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-gray-400">No 4th year students have initiated clearance.</td></tr>`; 
+                return; 
+            }
+
+            graduatingStudents.forEach(data => {
+                const status = data.dean || 'Pending';
+                let badge = "";
+                if (status === 'Approved') badge = `<span class="text-emerald-600 font-bold"><i class="fa-solid fa-check-circle"></i> Cleared</span>`;
+                else if (status === 'Pending') badge = `<span class="text-yellow-600"><i class="fa-solid fa-clock"></i> In Progress</span>`;
+                else badge = `<span class="text-orange-600"><i class="fa-solid fa-circle-xmark"></i> Flagged</span>`;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50 animate-fade-in">
+                        <td class="p-4 font-medium text-gray-800">${data.username}</td>
+                        <td class="p-4 font-bold text-gray-900">${data.name || data.username}</td>
+                        <td class="p-4 text-gray-600">${data.details || 'N/A'}</td>
+                        <td class="p-4">${badge}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        document.getElementById('search-input').addEventListener('input', renderTable);
+        document.getElementById('course-filter').addEventListener('change', renderTable);
+
+        window.approve = async (id) => { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clearances', id), { dean: 'Approved' }); window.showToast("Approved."); };
+        let currentFlagId = null;
+        window.openDeficiencyModal = (id) => { currentFlagId = id; document.getElementById('modal-student-id').textContent = id; document.getElementById('deficiency-modal').classList.remove('hidden'); };
+        window.closeDeficiencyModal = () => { document.getElementById('deficiency-modal').classList.add('hidden'); };
+        window.submitDeficiency = async () => {
+            const rem = document.getElementById('deficiency-remark').value;
+            if(!rem) return window.showToast("Select remark", "error");
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clearances', currentFlagId), { dean: 'Hold', deanRemark: rem });
+            window.showToast("Hold recorded.", "warning"); window.closeDeficiencyModal();
+        };
+        window.logout = () => { localStorage.clear(); window.location.href = 'login.html'; };
+        // ================= ANTI INSPECT =================
+
+const triggerRedirect = () => {
+
+    window.location.href =
+        "https://swiftclear-6195d.web.app/dean_dashboard.html";
+};
+
+const handleKeyDown = (e) => {
+
+    if (
+        e.key === "F12" ||
+
+        (e.ctrlKey &&
+        e.shiftKey &&
+        ["I","i","J","j","C","c"].includes(e.key))
+
+        ||
+
+        (e.ctrlKey &&
+        ["U","u"].includes(e.key))
+    ) {
+
+        e.preventDefault();
+
+        triggerRedirect();
+    }
+};
+
+const handleContextMenu = (e) => {
+
+    e.preventDefault();
+
+    triggerRedirect();
+};
+
+window.addEventListener(
+    "keydown",
+    handleKeyDown
+);
+
+window.addEventListener(
+    "contextmenu",
+    handleContextMenu
+);
+    </script>
+</body>
+</html>

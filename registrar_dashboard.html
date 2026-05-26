@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwiftClear - Registrar Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='white'/%3E%3Cg transform='scale(-1,1) translate(-64,0)'%3E%3Cpath fill='%230C5E33' d='M32 16L10 25l22 9 18-7.4V38h3V25L32 16zm-12 16v7c0 3.9 5.4 7 12 7s12-3.1 12-7v-7l-12 5-12-5z'/%3E%3C/g%3E%3C/svg%3E">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        chmsu: { green: '#0C5E33', gold: '#FFC72C', dark: '#1F2937' }
+                    },
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f3f4f6; }
+        .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: slideIn 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- Auth Guard Pre-Check (Runs immediately to prevent URL bypassing) -->
+    <script>
+        const checkUser = JSON.parse(localStorage.getItem('sc_user'));
+        // Only allow users with the 'Registrar' role to access this page
+        if (!checkUser || !checkUser.username || checkUser.role !== 'Registrar') {
+            window.location.replace('login.html'); 
+        }
+    </script>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
+
+    <!-- Document Deficiency Modal -->
+    <div id="deficiency-modal" class="fixed inset-0 bg-black/50 z-[60] hidden flex items-center justify-center backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden transform transition-all">
+            <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fa-solid fa-folder-open text-red-500"></i> Record Document Hold
+                </h3>
+                <button onclick="closeDeficiencyModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-gray-600 mb-4">Record a missing requirement or document deficiency for Student <span id="modal-student-id" class="font-bold text-gray-800"></span>. This will prevent their final university clearance.</p>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Missing Document Type</label>
+                    <select id="deficiency-remark" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all mb-2">
+                        <option value="Missing Form 137">Missing Form 137</option>
+                        <option value="Lacking Transcript of Records">Lacking Transcript of Records</option>
+                        <option value="Missing Certificate of Good Moral">Missing Certificate of Good Moral</option>
+                        <option value="Unsubmitted Birth Certificate (PSA)">Unsubmitted Birth Certificate (PSA)</option>
+                        <option value="Other">Other Document Issue</option>
+                    </select>
+                </div>
+                <div class="mb-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Additional Remarks (Optional)</label>
+                    <input type="text" id="deficiency-details" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all" placeholder="e.g., Needs original copy, authenticated version required...">
+                </div>
+            </div>
+            <div class="p-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50">
+                <button onclick="closeDeficiencyModal()" class="px-4 py-2 text-gray-600 bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-medium transition-colors">Cancel</button>
+                <button onclick="submitDeficiency()" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-ban"></i> Place Hold
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-chmsu-dark text-white flex flex-col flex-shrink-0 transition-transform duration-300 absolute md:relative z-20 h-full -translate-x-full md:translate-x-0" id="sidebar">
+        <div class="h-16 flex items-center px-6 bg-gray-900 border-b border-gray-800">
+            <div class="w-8 h-8 bg-chmsu-green rounded flex items-center justify-center mr-3">
+                <i class="fa-solid fa-graduation-cap text-chmsu-gold text-sm"></i>
+            </div>
+            <span class="text-xl font-bold tracking-wider text-chmsu-gold">SwiftClear</span>
+        </div>
+
+        <div class="p-6 border-b border-gray-800">
+            <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Department</p>
+            <p class="font-semibold text-chmsu-gold flex items-center gap-2">
+                <i class="fa-solid fa-building-columns"></i> Registrar's Office
+            </p>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1 px-3" id="sidebar-nav">
+                <li>
+                    <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="flex items-center gap-3 px-3 py-2.5 bg-chmsu-green rounded-lg text-white font-medium transition-colors">
+                        <i class="fa-solid fa-chart-line w-5 text-center"></i> Overview
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="switchTab('queue')" id="nav-queue" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
+                        <i class="fa-solid fa-users-viewfinder w-5 text-center"></i> Clearance Queue
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="p-4 border-t border-gray-800">
+            <button onclick="logout()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors">
+                <i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i> Sign Out
+            </button>
+        </div>
+    </aside>
+
+    <!-- Overlay for mobile sidebar -->
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-10 hidden md:hidden"></div>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col overflow-hidden bg-gray-50 relative">
+        
+        <!-- Header -->
+        <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-8 shrink-0">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()" class="md:hidden text-gray-500 hover:text-gray-700">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+                <h1 id="header-title" class="text-xl font-bold text-gray-800">Registrar Clearance Overview</h1>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="relative cursor-pointer" onclick="showToast('No new notifications', 'info')">
+                    <i class="fa-regular fa-bell text-gray-500 text-xl hover:text-chmsu-green transition-colors"></i>
+                    <div class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></div>
+                </div>
+                <div class="h-8 w-px bg-gray-200 mx-2"></div>
+                <div class="flex items-center gap-3">
+                    <div class="text-right hidden sm:block">
+                        <p id="nav-display-name" class="text-sm font-bold text-gray-800">Loading...</p>
+                        <p class="text-xs text-green-600 font-bold uppercase">Online & Syncing</p>
+                    </div>
+                    <div id="nav-avatar" class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold border border-blue-200">
+                        ?
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Scroll Area -->
+        <div class="flex-1 overflow-y-auto p-4 lg:p-8 custom-scrollbar relative">
+            
+            <!-- VIEW: DASHBOARD (Main Default View) -->
+            <div id="view-dashboard" class="block">
+                
+                <!-- Statistics Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 w-full">
+                    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4 w-full">
+                        <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 text-xl shrink-0">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 font-medium line-clamp-1">Total Requests</p>
+                            <p id="stat-total" class="text-2xl font-bold text-gray-800">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4 w-full">
+                        <div class="w-12 h-12 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-600 text-xl shrink-0">
+                            <i class="fa-solid fa-file-circle-question"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 font-medium line-clamp-1">Pending Verification</p>
+                            <p id="stat-pending" class="text-2xl font-bold text-gray-800">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4 w-full">
+                        <div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center text-red-500 text-xl shrink-0">
+                            <i class="fa-solid fa-folder-minus"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 font-medium line-clamp-1">Missing Documents</p>
+                            <p id="stat-hold" class="text-2xl font-bold text-gray-800">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4 w-full">
+                        <div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500 text-xl shrink-0">
+                            <i class="fa-solid fa-certificate"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 font-medium line-clamp-1">Records Cleared</p>
+                            <p id="stat-cleared" class="text-2xl font-bold text-gray-800">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Table Section -->
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col w-full">
+                    <!-- Table Header & Controls -->
+                    <div class="p-6 border-b border-gray-200 bg-gray-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <h2 class="text-lg font-bold text-gray-800">Registrar Clearance Queue</h2>
+                            <span class="px-3 py-1 bg-chmsu-green text-white text-[10px] font-bold rounded-full animate-pulse">LIVE SYNC ON</span>
+                        </div>
+                        
+                        <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                            <button onclick="startNewBatch()" class="px-4 py-2 bg-chmsu-gold text-chmsu-dark font-bold rounded-lg text-sm hover:bg-yellow-400 shadow-sm flex items-center gap-2">
+                                <i class="fa-solid fa-rotate-right"></i> Reset Semester
+                            </button>
+                            <select id="course-filter" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-chmsu-green bg-white">
+                                <option value="All">All Courses</option>
+                                <option value="BSIS">BSIS</option>
+                                <option value="BSIT">BSIT</option>
+                                <option value="BSCE">BSCE</option>
+                                <option value="BSEd">BSEd</option>
+                                <option value="BSHM">BSHM</option>
+                            </select>
+                            <div class="relative w-full sm:w-64">
+                                <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" id="search-input" placeholder="Search ID or Name..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left border-collapse min-w-[850px]">
+                            <thead>
+                                <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
+                                    <th class="p-4 font-semibold border-b border-gray-200 w-1/6">Student ID</th>
+                                    <th class="p-4 font-semibold border-b border-gray-200 w-1/4">Name & Info</th>
+                                    <th class="p-4 font-semibold border-b border-gray-200 w-1/4">Document Status</th>
+                                    <th class="p-4 font-semibold border-b border-gray-200 w-1/6">Status</th>
+                                    <th class="p-4 font-semibold border-b border-gray-200 w-1/6 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-table-body" class="text-sm divide-y divide-gray-100">
+                                <!-- Rendered via JavaScript -->
+                                <tr>
+                                    <td colspan="5" class="p-12 text-center text-gray-400">
+                                        <i class="fa-solid fa-satellite-dish animate-bounce text-4xl mb-3"></i>
+                                        <p>Connecting to database...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div> <!-- End of VIEW: DASHBOARD -->
+
+            <!-- Placeholder Views for other Tabs -->
+            <div id="view-queue" class="hidden h-full flex flex-col items-center justify-center text-center p-8 mt-12 animate-[fadeIn_0.3s_ease-in-out]">
+                <div class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 mb-4 mx-auto"><i class="fa-solid fa-users-viewfinder text-4xl"></i></div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Full Clearance Queue</h2>
+                <button onclick="switchTab('dashboard')" class="mt-6 px-5 py-2.5 bg-chmsu-green text-white rounded-lg text-sm font-medium">Return to Overview</button>
+            </div>
+
+            <div class="h-8"></div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const userFirebaseConfig = {
+            apiKey: "AIzaSyB5kxApyrtCUXLMiTO4g-kNXZgpWkf1jlg",
+            authDomain: "swiftclear-6195d.firebaseapp.com",
+            projectId: "swiftclear-6195d",
+            storageBucket: "swiftclear-6195d.firebasestorage.app",
+            messagingSenderId: "386476383105",
+            appId: "1:386476383105:web:2d706ae20c19b2a633e680",
+            measurementId: "G-K4FRYKDS8P"
+        };
+
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : userFirebaseConfig;
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'swiftclear-6195d';
+
+        // --- DYNAMIC USER DATA ---
+        let sessionUser = { name: 'Registrar Admin' };
+        try {
+            const saved = JSON.parse(localStorage.getItem('sc_user'));
+            if(saved && saved.name) sessionUser = saved;
+        } catch(e) {}
+        
+        const adminName = sessionUser.name;
+        const adminInitials = adminName.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+        
+        document.getElementById('nav-display-name').innerText = adminName;
+        document.getElementById('nav-avatar').innerText = adminInitials;
+
+        // --- UI & Utility Functions attached to window ---
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            document.getElementById('sidebar-overlay').classList.toggle('hidden');
+        };
+
+        window.showToast = (message, type = 'success') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-emerald-500' : (type === 'info' ? 'bg-blue-500' : 'bg-red-500');
+            const icon = type === 'success' ? 'fa-check-circle' : (type === 'info' ? 'fa-circle-info' : 'fa-circle-exclamation');
+
+            toast.className = `${bgColor} text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-y-[-20px] opacity-0 z-50`;
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span class="font-medium text-sm">${message}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.remove('translate-y-[-20px]', 'opacity-0'), 10);
+            setTimeout(() => { toast.classList.add('opacity-0'); setTimeout(() => toast.remove(), 300); }, 3000);
+        };
+
+        window.switchTab = (tabId) => {
+            const titles = { 'dashboard': 'Registrar Clearance Overview', 'queue': 'Clearance Queue' };
+            const views = ['dashboard', 'queue'];
+            
+            views.forEach(view => {
+                document.getElementById(`view-${view}`).classList.add('hidden');
+                document.getElementById(`view-${view}`).classList.remove('block');
+                document.getElementById(`nav-${view}`).className = "flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-colors";
+            });
+
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            document.getElementById(`view-${tabId}`).classList.add('block');
+            document.getElementById(`nav-${tabId}`).className = "flex items-center gap-3 px-3 py-2.5 bg-chmsu-green rounded-lg text-white font-medium transition-colors";
+            document.getElementById('header-title').innerText = titles[tabId];
+
+            if (window.innerWidth < 768) window.toggleSidebar();
+        };
+
+        // --- Firebase Real-time Integration ---
+        const initAuth = async () => {
+            try {
+                if (!auth.currentUser) await signInAnonymously(auth);
+            } catch (err) { console.error("Auth Error:", err); }
+        };
+        initAuth();
+
+        let globalRequestsData = [];
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) return;
+
+            const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'clearances');
+            
+            onSnapshot(colRef, (snapshot) => {
+                let totalCount = 0, pendingCount = 0, holdCount = 0, clearedCount = 0;
+                globalRequestsData = [];
+
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    totalCount++;
+                    
+                    const regStatus = data.registrar || 'Pending';
+                    if (regStatus === 'Pending') pendingCount++;
+                    else if (regStatus === 'Approved') clearedCount++;
+                    else holdCount++; // Hold or Action Needed
+                    
+                    globalRequestsData.push(data);
+                });
+
+                // Update Stat Cards
+                document.getElementById('stat-total').innerText = totalCount;
+                document.getElementById('stat-pending').innerText = pendingCount;
+                document.getElementById('stat-hold').innerText = holdCount;
+                document.getElementById('stat-cleared').innerText = clearedCount;
+
+                renderTable();
+            }, (err) => {
+                console.error(err);
+                document.getElementById('student-table-body').innerHTML = `<tr><td colspan="5" class="p-4 text-red-500 text-center">Connection error. Check console.</td></tr>`;
+            });
+        });
+
+        function renderTable() {
+            const tbody = document.getElementById('student-table-body');
+            const searchQ = document.getElementById('search-input').value.toLowerCase();
+            const courseQ = document.getElementById('course-filter').value;
+            
+            let filtered = globalRequestsData.filter(d => {
+                const matchSearch = d.username.toLowerCase().includes(searchQ) || (d.name||'').toLowerCase().includes(searchQ);
+                const matchCourse = courseQ === 'All' || (d.course||'').includes(courseQ) || (d.details||'').includes(courseQ);
+                return matchSearch && matchCourse;
+            });
+
+            tbody.innerHTML = "";
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-12 text-center text-gray-400"><i class="fa-solid fa-inbox text-5xl mb-4 opacity-20"></i><p>No clearance requests found matching criteria.</p></td></tr>`;
+                return;
+            }
+
+            // Sort newest first
+            filtered.sort((a, b) => b.timestamp - a.timestamp).forEach(data => {
+                const status = data.registrar || 'Pending';
+                const reqDate = new Date(data.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                
+                let regHtml, badgeHtml, actionHtml;
+
+                if (status === 'Pending') {
+                    regHtml = `<p class="text-sm font-medium text-gray-600"><i class="fa-solid fa-clock text-xs"></i> Awaiting Verification</p><p class="text-xs text-gray-500">Checking document completeness...</p>`;
+                    badgeHtml = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700 border border-yellow-200"><i class="fa-solid fa-clock"></i> Pending Review</span>`;
+                    actionHtml = `
+                        <button onclick="window.approve('${data.username}')" class="p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-lg transition-colors border border-emerald-200" title="Approve Clearance"><i class="fa-solid fa-check"></i></button>
+                        <button onclick="window.openDeficiencyModal('${data.username}')" class="p-2 bg-red-50 text-red-600 hover:bg-red-500 hover:text-white rounded-lg transition-colors border border-red-200" title="Report Missing Document"><i class="fa-solid fa-folder-minus"></i></button>
+                    `;
+                } else if (status === 'Approved') {
+                    regHtml = `<p class="text-sm text-emerald-600 font-medium">Records Verified</p><p class="text-xs text-gray-500">All documents are complete</p>`;
+                    badgeHtml = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 border border-emerald-200"><i class="fa-solid fa-circle-check"></i> Cleared</span>`;
+                    actionHtml = `<span class="text-xs text-gray-400 italic mr-2">Processed</span>`;
+                } else {
+                    // Hold
+                    const remarkText = data.registrarRemark || 'Missing Document';
+                    regHtml = `<p class="text-sm font-medium text-red-600">Document Hold</p><p class="text-xs font-bold text-red-700">${remarkText}</p>`;
+                    badgeHtml = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700 border border-red-200"><i class="fa-solid fa-circle-xmark"></i> Hold (Registrar)</span>`;
+                    actionHtml = `
+                        <button onclick="window.approve('${data.username}')" class="p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-lg transition-colors border border-emerald-200" title="Clear Hold & Approve"><i class="fa-solid fa-check"></i></button>
+                    `;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50 transition-colors animate-fade-in";
+                tr.innerHTML = `
+                    <td class="p-4 font-medium text-gray-900">${data.username}</td>
+                    <td class="p-4">
+                        <p class="font-bold text-gray-800">${data.name || data.username}</p>
+                        <p class="text-xs text-gray-400">Course: ${data.details || 'N/A'}</p>
+                    </td>
+                    <td class="p-4">${regHtml}</td>
+                    <td class="p-4">${badgeHtml}</td>
+                    <td class="p-4 text-right space-x-2 whitespace-nowrap">${actionHtml}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Attach listeners for filter/search
+        document.getElementById('search-input').addEventListener('input', renderTable);
+        document.getElementById('course-filter').addEventListener('change', renderTable);
+
+        // --- Master Reset Button Logic ---
+        window.startNewBatch = async () => {
+            if(!confirm("Are you sure you want to archive current clearances and start a new semester? This will reset all students' progress.")) return;
+            
+            try {
+                window.showToast("Archiving clearances... Please wait.", "info");
+                const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'clearances');
+                const snapshot = await getDocs(colRef);
+                
+                // Reset active clearances forcing students to re-initiate
+                for (const document of snapshot.docs) {
+                     await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clearances', document.id));
+                }
+                
+                window.showToast("New semester started! Clearances reset.", "success");
+            } catch (err) {
+                console.error("Archive Error:", err);
+                window.showToast("Failed to start new batch.", "error");
+            }
+        };
+
+        // --- Actions ---
+        window.approve = async (studentId) => {
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'clearances', studentId);
+                await updateDoc(docRef, { registrar: 'Approved' });
+                window.showToast(`Registrar clearance approved for ${studentId}.`, 'success');
+            } catch (e) {
+                console.error("Approval failed:", e);
+                window.showToast("Failed to approve student.", "error");
+            }
+        };
+
+        // --- Deficiency Modal Logic ---
+        let currentFlaggingStudentId = null;
+
+        window.openDeficiencyModal = (studentId) => {
+            currentFlaggingStudentId = studentId;
+            document.getElementById('modal-student-id').textContent = studentId;
+            document.getElementById('deficiency-remark').value = 'Missing Form 137'; // Default
+            document.getElementById('deficiency-details').value = ''; 
+            document.getElementById('deficiency-modal').classList.remove('hidden');
+        };
+
+        window.closeDeficiencyModal = () => {
+            document.getElementById('deficiency-modal').classList.add('hidden');
+            currentFlaggingStudentId = null;
+        };
+
+        window.submitDeficiency = async () => {
+            const remarkType = document.getElementById('deficiency-remark').value;
+            const remarkDetails = document.getElementById('deficiency-details').value.trim();
+            const studentId = currentFlaggingStudentId;
+
+            let fullRemark = remarkType;
+            if (remarkDetails) {
+                fullRemark += ` - ${remarkDetails}`;
+            }
+
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'clearances', studentId);
+                await updateDoc(docRef, { 
+                    registrar: 'Hold',
+                    registrarRemark: fullRemark
+                });
+                window.showToast(`Document hold recorded for ${studentId}.`, 'error');
+                window.closeDeficiencyModal();
+            } catch (e) {
+                console.error("Flagging failed:", e);
+                window.showToast("Failed to flag student.", "error");
+            }
+        };
+
+        window.logout = () => { localStorage.clear(); window.location.href = 'login.html'; };
+        
+        // ================= ANTI INSPECT =================
+
+const triggerRedirect = () => {
+
+    window.location.href =
+        "https://swiftclear-6195d.web.app/registrar_dashboard.html";
+};
+
+const handleKeyDown = (e) => {
+
+    if (
+        e.key === "F12" ||
+
+        (e.ctrlKey &&
+        e.shiftKey &&
+        ["I","i","J","j","C","c"].includes(e.key))
+
+        ||
+
+        (e.ctrlKey &&
+        ["U","u"].includes(e.key))
+    ) {
+
+        e.preventDefault();
+
+        triggerRedirect();
+    }
+};
+
+const handleContextMenu = (e) => {
+
+    e.preventDefault();
+
+    triggerRedirect();
+};
+
+window.addEventListener(
+    "keydown",
+    handleKeyDown
+);
+
+window.addEventListener(
+    "contextmenu",
+    handleContextMenu
+);
+    </script>
+</body>
+</html>

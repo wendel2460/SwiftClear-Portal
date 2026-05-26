@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwiftClear - Login & Registration</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='white'/%3E%3Cg transform='scale(-1,1) translate(-64,0)'%3E%3Cpath fill='%230C5E33' d='M32 16L10 25l22 9 18-7.4V38h3V25L32 16zm-12 16v7c0 3.9 5.4 7 12 7s12-3.1 12-7v-7l-12 5-12-5z'/%3E%3C/g%3E%3C/svg%3E">
+    
+    <script>
+        tailwind.config = {
+
+            theme: {
+                extend: {
+                    colors: {
+                        chmsu: { green: '#0C5E33', gold: '#FFC72C', dark: '#1F2937' }
+                    },
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+
+        .bg-pattern {
+            background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+        }
+        .form-transition { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .hide-form { opacity: 0; transform: translateY(10px); pointer-events: none; position: absolute; visibility: hidden; }
+        .show-form { opacity: 1; transform: translateY(0); pointer-events: auto; position: relative; visibility: visible; }
+        
+        /* Custom Scrollbar for Form */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4 sm:p-8">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
+
+    <!-- Main Container -->
+    <div class="max-w-5xl w-full bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row my-auto">
+        
+        <!-- Left Side: Branding / Info -->
+        <div class="md:w-5/12 bg-gradient-to-br from-chmsu-green to-[#084223] text-white p-10 flex flex-col justify-between relative overflow-hidden bg-pattern min-h-[300px]">
+            <div class="absolute -top-24 -left-24 w-64 h-64 bg-white opacity-5 rounded-full"></div>
+            <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-chmsu-gold opacity-10 rounded-full"></div>
+            
+            <div class="relative z-10">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg">
+                        <i class="fa-solid fa-graduation-cap text-chmsu-green text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold tracking-wider text-chmsu-gold">SwiftClear</h1>
+                        <p class="text-xs text-green-100 uppercase tracking-widest">CHMSU Portal</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 space-y-6">
+                    <h2 class="text-3xl font-bold leading-tight">Streamlined Student Clearance</h2>
+                    <p class="text-green-100 text-sm leading-relaxed">
+                        Experience a hassle-free, automated way to process your university clearances. Secure, fast, and entirely online.
+                    </p>
+                    
+                    <ul class="space-y-3 mt-8 text-sm text-green-50">
+                        <li class="flex items-center gap-3"><i class="fa-solid fa-circle-check text-chmsu-gold"></i> Real-time status tracking</li>
+                        <li class="flex items-center gap-3"><i class="fa-solid fa-circle-check text-chmsu-gold"></i> Multi-department integration</li>
+                        <li class="flex items-center gap-3"><i class="fa-solid fa-circle-check text-chmsu-gold"></i> Instant E-Clearance Generation</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="relative z-10 mt-12 text-xs text-green-200/60">
+                &copy; 2026 Carlos Hilado Memorial State University.<br>All rights reserved.
+            </div>
+        </div>
+
+        <!-- Right Side: Forms -->
+        <div class="md:w-7/12 p-8 md:p-12 relative flex items-center justify-center bg-white min-h-[600px]">
+            
+            <a href="https://swiftcleardocumentation.web.app/" target="_blank" class="absolute top-6 right-6 text-xs sm:text-sm text-gray-500 hover:text-chmsu-green font-medium flex items-center gap-2 transition-colors bg-gray-50 hover:bg-green-50 px-4 py-2 rounded-full border border-gray-200 shadow-sm z-20">
+                <i class="fa-solid fa-book-open"></i> <span class="hidden sm:inline">Documentation</span>
+            </a>
+
+            <div class="w-full max-w-md relative flex flex-col justify-center">
+                
+                <!-- ================= LOGIN FORM ================= -->
+                <div id="login-form" class="form-transition show-form w-full">
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-bold text-gray-800">Welcome Back</h2>
+                        <p class="text-sm text-gray-500 mt-2">Sign in to access your clearance dashboard</p>
+                    </div>
+
+                    <form onsubmit="handleLogin(event)" class="space-y-5">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <i class="fa-regular fa-user text-gray-400"></i>
+                                </div>
+                                <input type="text" id="login-identifier" required class="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all" placeholder="someone@example.com">
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="block text-sm font-medium text-gray-700">Password</label>
+                                <button type="button" onclick="toggleForms('forgot')" class="text-xs font-semibold text-chmsu-green hover:text-[#084223] focus:outline-none">Forgot password?</button>
+                            </div>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-lock text-gray-400"></i>
+                                </div>
+                                <input type="password" id="login-password" required class="w-full pl-11 pr-10 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all" placeholder="••••••••">
+                                <button type="button" onclick="togglePassword('login-password', this)" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button id="login-btn" type="submit" class="w-full bg-chmsu-green hover:bg-[#084223] text-white font-bold py-3.5 rounded-2xl transition-all shadow-lg mt-4">
+                            Sign In
+                        </button>
+                    </form>
+
+                    <p class="mt-8 text-center text-sm text-gray-600">
+                        Don't have an account? 
+                        <button type="button" onclick="toggleForms('signup')" class="font-bold text-chmsu-green hover:underline focus:outline-none">Register Here</button>
+                    </p>
+                </div>
+
+                <!-- ================= SIGN UP FORM ================= -->
+                <div id="signup-form" class="form-transition hide-form flex flex-col w-full absolute top-1/2 left-0 right-0 transform -translate-y-1/2">
+                    <div class="text-center mb-6 flex-shrink-0">
+                        <h2 class="text-3xl font-bold text-gray-800">Create Account</h2>
+                        <p class="text-sm text-gray-500 mt-1">Register to start your clearance process</p>
+                    </div>
+
+                    <!-- Scrollable Form Area with softer custom scrollbar -->
+                    <div class="overflow-y-auto custom-scrollbar pr-2 max-h-[60vh]">
+                        <form onsubmit="handleSignup(event)" class="space-y-4 pb-2 px-1">
+                            
+                            <!-- Name Block -->
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">First Name</label>
+                                    <input type="text" id="signup-first" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="Juan">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Middle Name</label>
+                                    <input type="text" id="signup-middle" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="Santos">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Last Name</label>
+                                    <input type="text" id="signup-last" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="Dela Cruz">
+                                </div>
+                            </div>
+
+                            <!-- ID & Contact -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Student ID</label>
+                                    <input type="text" id="signup-id" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="12345678">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Contact Number</label>
+                                    <input type="tel" id="signup-contact" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="09XX XXX XXXX">
+                                </div>
+                            </div>
+
+                            <!-- Course / Program Dropdown -->
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Course / Program</label>
+                                <select id="signup-course" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm bg-white">
+                                    <option value="" disabled selected>Select your program...</option>
+                                    <optgroup label="Arts, Science & Public Admin">
+                                        <option value="BAEL">Bachelor of Arts in English Language</option>
+                                        <option value="BASS">Bachelor of Arts in Social Science</option>
+                                        <option value="BPA">Bachelor of Public Administration</option>
+                                        <option value="BSAM">Bachelor of Science in Applied Mathematics</option>
+                                        <option value="BSP">Bachelor of Science in Psychology</option>
+                                    </optgroup>
+                                    <optgroup label="Business & Management">
+                                        <option value="BSHM">Bachelor of Science in Hospitality Management</option>
+                                        <option value="BSOA">Bachelor of Science in Office Administration</option>
+                                        <option value="BSIS">Bachelor of Science in Information Systems</option>
+                                    </optgroup>
+                                    <optgroup label="Education">
+                                        <option value="BECEd">Bachelor of Early Childhood Education</option>
+                                        <option value="BEEd">Bachelor of Elementary Education</option>
+                                        <option value="BPEd">Bachelor of Physical Education</option>
+                                        <option value="BSNEd">Bachelor of Special Needs Education</option>
+                                    </optgroup>
+                                    <optgroup label="Secondary Education">
+                                        <option value="BSEd-English">BSEd - Major in English</option>
+                                        <option value="BSEd-Filipino">BSEd - Major in Filipino</option>
+                                        <option value="BSEd-Math">BSEd - Major in Mathematics</option>
+                                        <option value="BSEd-Science">BSEd - Major in Science</option>
+                                    </optgroup>
+                                    <optgroup label="Tech & Livelihood Education">
+                                        <option value="BTLEd-HE">BTLEd - Home Economics</option>
+                                        <option value="BTLEd-IA">BTLEd - Industrial Arts</option>
+                                    </optgroup>
+                                    <optgroup label="Engineering & Technology">
+                                        <option value="BSCE">Bachelor of Science in Civil Engineering</option>
+                                        <option value="BIT-ArchDrafting">BIT - Architectural Drafting</option>
+                                        <option value="BIT-Automotive">BIT - Automotive Technology</option>
+                                        <option value="BIT-Electrical">BIT - Electrical Technology</option>
+                                        <option value="BIT-Electronics">BIT - Electronics Technology</option>
+                                        <option value="BIT-Apparel">BIT - Apparel & Fashion Tech</option>
+                                        <option value="BIT-Culinary">BIT - Culinary Technology</option>
+                                        <option value="BIT-Mechanical">BIT - Mechanical Technology</option>
+                                        <option value="BIT-HVACR">BIT - HVACR</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+
+                            <!-- Year & Section Dropdowns -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Year Level</label>
+                                    <select id="signup-year" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm bg-white">
+                                        <option value="" disabled selected>Select Year</option>
+                                        <option value="1">1st Year</option>
+                                        <option value="2">2nd Year</option>
+                                        <option value="3">3rd Year</option>
+                                        <option value="4">4th Year</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Section</label>
+                                    <select id="signup-section" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm bg-white">
+                                        <option value="" disabled selected>Select Section</option>
+                                        <option value="A">A</option>
+                                        <option value="B">B</option>
+                                        <option value="C">C</option>
+                                        <option value="D">D</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Email -->
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Email Address</label>
+                                <input type="email" id="signup-email" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="student@chmsu.edu.ph">
+                            </div>
+
+                            <!-- Passwords -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Password</label>
+                                    <input type="password" id="signup-password" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="••••••••">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Confirm</label>
+                                    <input type="password" id="signup-confirm" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all text-sm" placeholder="••••••••">
+                                </div>
+                            </div>
+
+                            <button id="signup-btn" type="submit" class="w-full bg-chmsu-green hover:bg-[#084223] text-white font-bold py-3.5 rounded-2xl transition-all shadow-lg mt-6 flex justify-center items-center gap-2">
+                                Create Account
+                            </button>
+                        </form>
+                    </div>
+
+                    <p class="mt-4 flex-shrink-0 text-center text-sm text-gray-600">
+                        Already have an account? 
+                        <button type="button" onclick="toggleForms('login')" class="font-bold text-chmsu-green hover:underline focus:outline-none">Sign In</button>
+                    </p>
+                </div>
+
+                <!-- ================= FORGOT PASSWORD FORM ================= -->
+                <div id="forgot-form" class="form-transition hide-form w-full absolute top-1/2 left-0 right-0 transform -translate-y-1/2">
+                    <button type="button" onclick="toggleForms('login')" class="absolute -top-12 left-0 text-gray-400 hover:text-chmsu-green transition-colors flex items-center gap-1 text-sm font-medium focus:outline-none">
+                        <i class="fa-solid fa-arrow-left"></i> Back to login
+                    </button>
+                    
+                    <div class="text-center mb-8 mt-2">
+                        <div class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+                            <i class="fa-solid fa-key text-2xl text-chmsu-green"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-800">Account Recovery</h2>
+                        <p class="text-sm text-gray-500 mt-3 px-4">Enter your registered email address. We will send you a secure link to reset your password.<br><span class="text-red-500 font-medium">Please check your Spam/Junk folder!</span></p>
+                    </div>
+
+                    <form onsubmit="handleForgotPassword(event)" class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Registered Email Address</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <i class="fa-regular fa-envelope text-gray-400"></i>
+                                </div>
+                                <input type="email" id="forgot-email" required class="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-chmsu-green focus:border-chmsu-green outline-none transition-all" placeholder="student@chmsu.edu.ph">
+                            </div>
+                        </div>
+
+                        <button id="forgot-btn" type="submit" class="w-full bg-chmsu-green hover:bg-[#084223] text-white font-bold py-3.5 rounded-2xl transition-all transform hover:-translate-y-0.5 shadow-lg shadow-green-900/20">
+                            Send Reset Link
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+          <script type="module">
+
+          // ================= FIREBASE IMPORTS =================
+          import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+          import {
+              getAuth,
+              signInWithEmailAndPassword,
+              createUserWithEmailAndPassword,
+              sendPasswordResetEmail,
+              signInAnonymously
+          } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+          import {
+              getFirestore,
+              doc,
+              setDoc,
+              getDoc,
+              collection,
+              query,
+              where,
+              getDocs
+          } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+          // ================= FIREBASE CONFIG =================
+          const firebaseConfig = {
+              apiKey: "AIzaSyB5kxApyrtCUXLMiTO4g-kNXZgpWkf1jlg",
+              authDomain: "swiftclear-6195d.firebaseapp.com",
+              projectId: "swiftclear-6195d",
+              storageBucket: "swiftclear-6195d.appspot.com",
+              messagingSenderId: "386476383105",
+              appId: "1:386476383105:web:2d706ae20c19b2a633e680",
+              measurementId: "G-K4FRYKDS8P"
+          };
+
+          // ================= INITIALIZE =================
+          const app = initializeApp(firebaseConfig);
+
+          const auth = getAuth(app);
+          const db = getFirestore(app);
+
+          const appId = "swiftclear-6195d";
+
+          // ================= ADMIN ACCOUNTS =================
+          const ADMIN_ACCOUNTS = {
+              'reg': {
+                  role: 'Registrar',
+                  name: 'Registrar Admin',
+                  redirect: 'registrar_dashboard.html'
+              },
+
+              'lib': {
+                  role: 'Library',
+                  name: 'Chief Librarian',
+                  redirect: 'library_dashboard.html'
+              },
+
+              'bus': {
+                  role: 'Business Office',
+                  name: 'Accounting Officer',
+                  redirect: 'business_dashboard.html'
+              },
+
+              'osas': {
+                  role: 'OSAS',
+                  name: 'OSAS Coordinator',
+                  redirect: 'osas_dashboard.html'
+              },
+
+              'cict_dean': {
+                  role: 'College Dean',
+                  name: 'Dean of CICT',
+                  redirect: 'dean_dashboard.html'
+              }
+          };
+
+          // ================= SIGNUP =================
+          window.handleSignup = async (e) => {
+
+              e.preventDefault();
+
+              const fName = document.getElementById('signup-first').value.trim();
+              const mName = document.getElementById('signup-middle').value.trim();
+              const lName = document.getElementById('signup-last').value.trim();
+
+              const studentId = document.getElementById('signup-id').value.trim();
+
+              const contact = document.getElementById('signup-contact').value.trim();
+
+              const email = document.getElementById('signup-email').value.trim();
+
+              const course = document.getElementById('signup-course').value;
+
+              const year = document.getElementById('signup-year').value;
+
+              const section = document.getElementById('signup-section').value;
+
+              const password = document.getElementById('signup-password').value;
+
+              const confirm = document.getElementById('signup-confirm').value;
+
+              const btn = document.getElementById('signup-btn');
+
+              if (password !== confirm) {
+
+                  window.showToast("Passwords do not match!", "error");
+
+                  return;
+              }
+
+              const fullName =
+                  `${fName} ${mName} ${lName}`.replace(/\s+/g, ' ').trim();
+
+              const courseDetails =
+                  `${course} ${year}-${section}`;
+
+              btn.innerHTML =
+                  '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+
+              btn.disabled = true;
+
+              try {
+
+
+                  const userCredential =
+                      await createUserWithEmailAndPassword(
+                          auth,
+                          email,
+                          password
+                      );
+
+                  const user = userCredential.user;
+
+                  const userData = {
+
+                      username: studentId,
+                      email: email,
+                      role: 'Student',
+
+                      name: fullName,
+
+                      firstName: fName,
+                      middleName: mName,
+                      lastName: lName,
+
+                      contact: contact,
+
+                      course: course,
+                      yearLevel: year,
+                      section: section,
+
+                      details: courseDetails,
+
+                      redirect: 'student_dashboard.html',
+
+                      createdAt: Date.now()
+                  };
+
+		await setDoc(
+		    doc(
+			db,
+			'artifacts',
+			appId,
+			'public',
+			'data',
+			'users',
+			studentId
+		    ),
+		    userData
+		);
+
+                  localStorage.setItem(
+                      'sc_user',
+                      JSON.stringify({
+                          username: studentId,
+                          name: fullName,
+                          role: 'Student',
+                          details: courseDetails
+                      })
+                  );
+
+                  window.showToast(
+                      "Account created successfully!",
+                      "success"
+                  );
+
+                  setTimeout(() => {
+
+                      window.location.href =
+                          'student_dashboard.html';
+
+                  }, 1500);
+
+              } catch (error) {
+
+                  console.error(error);
+
+                  window.showToast(
+                      error.message,
+                      "error"
+                  );
+
+              } finally {
+
+                  btn.innerHTML = 'Create Account';
+
+                  btn.disabled = false;
+              }
+          };
+
+          // ================= LOGIN =================
+          window.handleLogin = async (e) => {
+
+              e.preventDefault();
+
+              const identifier =
+                  document.getElementById('login-identifier')
+                  .value
+                  .trim();
+
+              const password =
+                  document.getElementById('login-password')
+                  .value;
+
+              const btn =
+                  document.getElementById('login-btn');
+
+              btn.innerHTML =
+                  '<i class="fa-solid fa-spinner fa-spin"></i> Signing In...';
+
+              btn.disabled = true;
+
+              // ===== ADMIN LOGIN =====
+              if (
+                  ADMIN_ACCOUNTS[identifier] &&
+
+                  password === 'pass123'
+              ) {
+
+                  const adminData =
+                      ADMIN_ACCOUNTS[identifier];
+
+                  localStorage.setItem(
+                      'sc_user',
+                      JSON.stringify({
+                          username: identifier,
+                          name: adminData.name,
+                          role: adminData.role,
+                          details: adminData.role
+                      })
+                  );
+
+                  window.showToast(
+                      `Welcome, ${adminData.name}!`,
+                      'success'
+                  );
+
+                  setTimeout(() => {
+
+                      window.location.href =
+                          adminData.redirect;
+
+                  }, 1000);
+
+                  return;
+              }
+
+              try {
+
+                  let emailToLogin = identifier;
+
+
+                  // ===== FIREBASE LOGIN =====
+                  const userCredential =
+                      await signInWithEmailAndPassword(
+                          auth,
+                          emailToLogin,
+                          password
+                      );
+
+                  const user = userCredential.user;
+
+		const usersRef = collection(
+		    db,
+		    'artifacts',
+		    appId,
+		    'public',
+		    'data',
+		    'users'
+		);
+
+		const q = query(
+		    usersRef,
+		    where('email', '==', emailToLogin)
+		);
+
+		const querySnapshot = await getDocs(q);
+
+		if (querySnapshot.empty) {
+
+		    window.showToast(
+			"Profile not found.",
+			"error"
+		    );
+
+		    return;
+		}
+
+		const userData = querySnapshot.docs[0].data();
+
+                  localStorage.setItem(
+                      'sc_user',
+                      JSON.stringify({
+                          username: userData.username,
+                          name: userData.name,
+                          role: userData.role,
+                          details:
+                              userData.details ||
+                              userData.role
+                      })
+                  );
+
+                  window.showToast(
+                      `Welcome, ${userData.name}!`,
+                      "success"
+                  );
+
+                  setTimeout(() => {
+
+                      window.location.href =
+
+                          userData.redirect ||
+                          'student_dashboard.html';
+
+                  }, 1000);
+
+              } catch (error) {
+
+                  console.error(error);
+
+                  window.showToast(
+                      error.message,
+                      "error"
+                  );
+
+              } finally {
+
+                  btn.innerHTML = 'Sign In';
+
+                  btn.disabled = false;
+              }
+          };
+
+          // ================= FORGOT PASSWORD =================
+          window.handleForgotPassword = async (e) => {
+
+              e.preventDefault();
+
+              const email =
+                  document.getElementById('forgot-email')
+                  .value
+                  .trim();
+
+              const btn =
+                  document.getElementById('forgot-btn');
+
+              btn.innerHTML =
+                  '<i class="fa-solid fa-spinner fa-spin"></i> Checking...';
+
+              btn.disabled = true;
+
+              try {
+
+                  // SEARCH USER EMAIL IN FIRESTORE
+                  const usersRef = collection(
+                      db,
+                      'artifacts',
+                      appId,
+                      'public',
+                      'data',
+                      'users'
+                  );
+
+                  const q = query(
+                      usersRef,
+                      where('email', '==', email)
+                  );
+
+                  const querySnapshot =
+                      await getDocs(q);
+
+                  // NO ACCOUNT FOUND
+                  if (querySnapshot.empty) {
+
+                      window.showToast(
+                          "No account registered with this email.",
+                          "error"
+                      );
+
+                      return;
+                  }
+
+                  // SEND RESET EMAIL
+                  await sendPasswordResetEmail(
+                      auth,
+                      email
+                  );
+
+                  window.showToast(
+                      "Password reset link sent to your email.",
+                      "success"
+                  );
+
+              } catch (error) {
+
+                  console.error(error);
+
+                  window.showToast(
+                      error.message,
+                      "error"
+                  );
+
+              } finally {
+
+                  btn.innerHTML =
+                      'Send Reset Link';
+
+                  btn.disabled = false;
+              }
+          };
+          // ================= PASSWORD TOGGLE =================
+          window.togglePassword = (inputId, button) => {
+
+              const input =
+                  document.getElementById(inputId);
+
+              const icon =
+                  button.querySelector('i');
+
+              if (input.type === 'password') {
+
+                  input.type = 'text';
+
+                  icon.classList.remove('fa-eye');
+
+                  icon.classList.add('fa-eye-slash');
+
+              } else {
+
+                  input.type = 'password';
+
+                  icon.classList.remove('fa-eye-slash');
+
+                  icon.classList.add('fa-eye');
+              }
+          };
+
+          // ================= FORM TOGGLE =================
+          window.toggleForms = (target) => {
+
+              const login =
+                  document.getElementById('login-form');
+
+              const signup =
+                  document.getElementById('signup-form');
+
+              const forgot =
+                  document.getElementById('forgot-form');
+
+              [login, signup, forgot].forEach(form => {
+
+                  form.classList.remove('show-form');
+
+                  form.classList.add('hide-form');
+              });
+
+              if (target === 'login') {
+
+                  login.classList.remove('hide-form');
+
+                  login.classList.add('show-form');
+
+              } else if (target === 'signup') {
+
+                  signup.classList.remove('hide-form');
+
+                  signup.classList.add('show-form');
+
+              } else {
+
+                  forgot.classList.remove('hide-form');
+
+                  forgot.classList.add('show-form');
+              }
+          };
+
+          // ================= TOAST =================
+          window.showToast = (message, type = 'success') => {
+
+              const container =
+                  document.getElementById('toast-container');
+
+              const toast =
+                  document.createElement('div');
+
+              let bgColor = 'bg-emerald-500';
+
+              let icon = 'fa-check-circle';
+
+              if (type === 'error') {
+
+                  bgColor = 'bg-red-500';
+
+                  icon = 'fa-circle-exclamation';
+              }
+
+              toast.className =
+                  `${bgColor} text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3`;
+
+              toast.innerHTML =
+                  `<i class="fa-solid ${icon}"></i>
+                   <span>${message}</span>`;
+
+              container.appendChild(toast);
+
+              setTimeout(() => {
+
+                  toast.remove();
+
+              }, 4000);
+          };
+          // ================= ANTI INSPECT =================
+
+		const triggerRedirect = () => {
+
+		    window.location.href =
+			"https://swiftclear-6195d.web.app/";
+		};
+
+		const handleKeyDown = (e) => {
+
+		    if (
+			e.key === "F12" ||
+
+			(e.ctrlKey &&
+
+			e.shiftKey &&
+			["I","i","J","j","C","c"].includes(e.key))
+
+			||
+
+			(e.ctrlKey &&
+			["U","u"].includes(e.key))
+		    ) {
+
+			e.preventDefault();
+
+			triggerRedirect();
+		    }
+		};
+
+		const handleContextMenu = (e) => {
+
+		    e.preventDefault();
+
+		    triggerRedirect();
+		};
+
+		window.addEventListener(
+		    "keydown",
+		    handleKeyDown
+		);
+
+		window.addEventListener(
+		    "contextmenu",
+		    handleContextMenu
+		);
+
+          </script>
+</body>
+</html>
+
